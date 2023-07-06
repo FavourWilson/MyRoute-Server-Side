@@ -21,6 +21,8 @@ app.use(express.static(path.join(__dirname, "/public")));
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/drivers", driverRouter);
 app.use("/api/v1/banks", bankRouter);
+app.use("/api/v1/cards", cardRouter);
+app.use("/api/v1/cars", carRouter);
 
 app.use(generalErrorHandler);
 app.get("/", (req, res) => {
