@@ -32,7 +32,6 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		required: [true, "Password cannot be empty"],
 	},
-	
 	verificationCode: {
 		type: String,
 		required: [true, "Verification code cannot be empty"],
