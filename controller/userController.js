@@ -94,10 +94,10 @@ exports.signUp = catchAsync(async (req, res, next) => {
 		});
 	
 
-		if (!firstName) return next(new appError("An email is required", 404));
-		if (!lastName) return next(new appError("An email is required", 404));
-		if (!phone) return next(new appError("An email is required", 404));
-		if (!gender) return next(new appError("An email is required", 404));
+		if (!firstName) return next(new appError("An firstname is required", 404));
+		if (!lastName) return next(new appError("An lastname is required", 404));
+		if (!phone) return next(new appError("An phone is required", 404));
+		if (!gender) return next(new appError("An gender is required", 404));
 		if (!email) return next(new appError("An email is required", 404));
 		if (!password) return next(new appError("A password is required", 404));
 		const user = await User.create({ firstName, lastName,phone, gender, verificationCode, email, password });
