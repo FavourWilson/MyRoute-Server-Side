@@ -3,6 +3,8 @@ const User = require("../models/userModel");
 const appError = require("../utils/appError");
 const { catchAsync } = require("../utils/catchAsync");
 const { promisify } = require("util");
+const AfricasTalking = require('africastalking')(credentials);
+
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 const cloudinary = require("cloudinary").v2;
@@ -12,6 +14,14 @@ cloudinary.config({
   api_key: process.env.API_KEY, 
   api_secret: process.env.API_SECRET 
 });
+
+const credentials = {
+    apiKey: process.env.API_KEY,
+    username: process.env.USERNAME
+}
+
+const sms   = AfricasTalking.SMS;
+const token = AfricasTalking.TOKEN;
 
 const createSendToken = (res, status, user) => {
 	try {
@@ -93,6 +103,22 @@ exports.signUp = catchAsync(async (req, res, next) => {
 		});
 		});
 	
+		const options = {
+        // Set the numbers you want to send to in international format
+        to: req.body.phone,
+        // Set your message
+        message:`Your verification code is ${req.body.verificationCode}`,
+        // Set your shortCode or senderId
+        from: 'MyRoute'
+    }
+
+    // That’s it, hit send and we’ll take care of the rest
+    sms.send(options)
+        .then(console.log)
+        .catch(console.log);
+
+
+		
         const user = await User.create(body);
 		createSendToken(res, 201, user);
 		if (!firstName) return next(new appError("An firstname is required", 404));
