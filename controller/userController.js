@@ -3,7 +3,6 @@ const User = require("../models/userModel");
 const appError = require("../utils/appError");
 const { catchAsync } = require("../utils/catchAsync");
 const { promisify } = require("util");
-const AfricasTalking = require('africastalking')(credentials);
 
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
@@ -19,9 +18,10 @@ const credentials = {
     apiKey: process.env.API_KEY,
     username: process.env.USERNAME
 }
+const AfricasTalking = require('africastalking')(credentials);
 
 const sms   = AfricasTalking.SMS;
-const token = AfricasTalking.TOKEN;
+// const token = AfricasTalking.TOKEN;
 
 const createSendToken = (res, status, user) => {
 	try {
