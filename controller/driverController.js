@@ -6,13 +6,10 @@ const { promisify } = require("util");
 const dotenv = require("dotenv");
 const Driver = require("../models/driverModel");
 dotenv.config({ path: "./config.env" });
-const cloudinary = require("cloudinary").v2;
 
-cloudinary.config({ 
-  cloud_name: process.env.CLOUD_NAME, 
-  api_key: process.env.API_KEY, 
-  api_secret: process.env.API_SECRET 
-});
+const cloudinary = require("../config/cloudinaryConfig");
+const uploader = require("../config/cloudinaryConfig");
+
 
 exports.createDriver = catchAsync(async (req, res, next) => {
 	try {
@@ -23,51 +20,63 @@ exports.createDriver = catchAsync(async (req, res, next) => {
             inSideCar: req.body.inSideCarPhoto
 		}
 
-		cloudinary.uploader.upload(data.license)
-		.then((result) => {
-		response.status(200).send({
-			message: "success",
-			result,
-		});
-		}).catch((error) => {
-		response.status(500).send({
-			message: "failure",
-			error,
-		});
-        });
+
+
+		if(req.file) {
+		const file = dataUri(req).content;
+		return uploader.upload(file).then((result) => {
+		const image = result.url;
+		return res.status(200).json({
+		messge: 'Your image has been uploded successfully to cloudinary',
+		data: {
+		image
+		}
+
+	// 	cloudinary.uploader.upload(data.license)
+	// 	.then((result) => {
+	// 	response.status(200).send({
+	// 		message: "success",
+	// 		result,
+	// 	});
+	// 	}).catch((error) => {
+	// 	response.status(500).send({
+	// 		message: "failure",
+	// 		error,
+	// 	});
+    //     });
         
-		cloudinary.uploader.upload(data.outSideCar)
-		.then((result) => {
-		response.status(200).send({
-			message: "success",
-			result,
-		});
-		}).catch((error) => {
-		response.status(500).send({
-			message: "failure",
-			error,
-		});
-		});
-		cloudinary.uploader.upload(data.inSideCar)
-		.then((result) => {
-		response.status(200).send({
-			message: "success",
-			result,
-		});
-		}).catch((error) => {
-		response.status(500).send({
-			message: "failure",
-			error,
-		});
-		});
+	// 	cloudinary.uploader.upload(data.outSideCar)
+	// 	.then((result) => {
+	// 	response.status(200).send({
+	// 		message: "success",
+	// 		result,
+	// 	});
+	// 	}).catch((error) => {
+	// 	response.status(500).send({
+	// 		message: "failure",
+	// 		error,
+	// 	});
+	// 	});
+	// 	cloudinary.uploader.upload(data.inSideCar)
+	// 	.then((result) => {
+	// 	response.status(200).send({
+	// 		message: "success",
+	// 		result,
+	// 	});
+	// 	}).catch((error) => {
+	// 	response.status(500).send({
+	// 		message: "failure",
+	// 		error,
+	// 	});
+	// 	});
 	
 
 		
-		const driver = await Driver.create(body);
-		res.status(201).json({
-			status: "success",
-			data: {driver	},
-		});
+	// 	const driver = await Driver.create(body);
+	// 	res.status(201).json({
+	// 		status: "success",
+	// 		data: {driver	},
+	// 	});
 
 	}  catch (error) {
 		console.error(error);
