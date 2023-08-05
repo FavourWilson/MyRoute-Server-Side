@@ -18,9 +18,9 @@ const credentials = {
     apiKey: process.env.API_KEY,
     username: process.env.USERNAME
 }
-const AfricasTalking = require('africastalking')(credentials);
 
-const sms   = AfricasTalking.SMS;
+const AfricasTalking = require('africastalking')(credentials);
+const sms = AfricasTalking.SMS;
 // const token = AfricasTalking.TOKEN;
 
 const createSendToken = (res, status, user) => {

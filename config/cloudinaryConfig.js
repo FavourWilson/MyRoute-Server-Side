@@ -1,6 +1,7 @@
 const cloudinary = require("cloudinary").v2;
 const uploader = require("cloudinary").v2;
-import dotenv from 'dotenv';
+const dotenv = require("dotenv");
+
 dotenv.config()
 const cloudinaryConfig = (req, res, next) => {
     cloudinary.config({
