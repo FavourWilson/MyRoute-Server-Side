@@ -17,7 +17,8 @@ const { generalErrorHandler } = require("./utils/generalErrorHandler");
 const app = express();
 
 // parsing incoming Json data
-app.use(express.json());
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({limit: '50mb', extended: true}));
 
 // Accessing the cookies sent with the request
 app.use(cookieParser());

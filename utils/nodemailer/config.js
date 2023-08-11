@@ -1,17 +1,13 @@
 const nodemailer = require("nodemailer");
-const fs = require("fs");
-const path = require("path");
-const dotenv = require("dotenv")
 
-dotenv.config({ path: "./config.env" });
-
-exports.sendEmail = async (email, subject, payload) => {
+exports.sendMail = async (email, subject, payload) => {
 
   try {
     // create reusable transporter object
     const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
+      host: "smtp.gmail.com",
       port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD,
@@ -30,14 +26,16 @@ exports.sendEmail = async (email, subject, payload) => {
     // Send email
     transporter.sendMail(options(), (error, info) => {
       if (error) {
-        return error;
+        console.log({
+          success: false, error
+        });
       } else {
-        return res.status(200).json({
+        console.log({
           success: true,
         });
       }
     });
   } catch (error) {
-    res.status(500).json({ errorMessage: "Could not sent email"});
+    console.log({ errorMessage: "Could not sent email"});
   }
 };
