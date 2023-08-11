@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema
+const Schema = mongoose.Schema;
 
 const DriverSchema = new Schema({
-  userId: {
+  user_Id: {
     type: Schema.Types.ObjectId,
     required: true,
     ref: "user",

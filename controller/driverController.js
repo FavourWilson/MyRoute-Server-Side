@@ -8,7 +8,7 @@ const handleImgUpload = require("../utils/cloudinary/cloudinary");
 exports.createDriver = catchAsync(async (req, res, next) => {
   try {
     const {
-      userId,
+      user_Id,
       referral_code,
       vehicle_Manufacturer,
       vehicle_Model,
@@ -30,7 +30,7 @@ exports.createDriver = catchAsync(async (req, res, next) => {
       handleImgUpload(outSide_Car_Photo).then((outside_car_photo_img) => {
         handleImgUpload(inSide_Car_Photo).then(async(inside_car_photo_img) => {
           await new Driver({
-            userId,
+            user_Id,
             referral_code,
             vehicle_Manufacturer,
             vehicle_Model,
