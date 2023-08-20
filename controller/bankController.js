@@ -7,7 +7,7 @@ const Bank = require("../models/bankmodel");
 exports.createBank = catchAsync(async (req, res, next) => {
 	try {
 		const { body } = req;
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                
 		console.log(body);
 
 		// save the article here
