@@ -80,6 +80,9 @@ const Router = express.Router();
  *   get:
  *     summary: Get all users cars
  *     tags: [Car]
+ *     parameters:
+ *       - in: path
+ *         name: id
  *     requestBody:
  *       required: true
  *       content:
@@ -109,7 +112,7 @@ const Router = express.Router();
  *     tags: [Car]
  *     parameters:
  *       - in: path
- *         name:
+ *         name: id
  *     requestBody:
  *       required: true
  *       content:

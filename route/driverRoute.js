@@ -79,7 +79,7 @@ const Router = express.Router();
  * tags:
  *   name: Users
  *   description: The signup new users
- * /api/v1/users:
+ * /api/v1/drivers:
  *   post:
  *     summary: Get link for your password
  *     tags: [Driver]
