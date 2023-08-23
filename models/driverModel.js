@@ -22,6 +22,10 @@ const DriverSchema = new Schema({
     type: String,
     required: [true, "Vehicle year cannot be empty"],
   },
+  vehicle_color: {
+    type: String,
+    required: [true, "Vehicle color cannot be empty"],
+  },
   plate_number_license: {
     type: String,
     required: [true, "License plate number cannot be empty"],
