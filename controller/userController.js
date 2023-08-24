@@ -246,12 +246,13 @@ exports.verifyUser = async (req, res) => {
         .status(404)
         .json({ message: "Invalid or expired verification code" });
 
+
     if (verificationCode !== codeVerification.verificationCode)
-      return res.status(404).json({ message: "Not successfully verified" });
+      return res.status(400).json({ message: "Not successfully verified" });
 
     // verify the code and make user account active
     res
-      .status(400)
+      .status(200)
       .json({ message: "Verification code successfully verified" });
 
     await User.updateOne(
@@ -259,7 +260,7 @@ exports.verifyUser = async (req, res) => {
       { $set: { isActive: true } },
       { new: true }
     );
-    
+
     // delete the current code verification
     await codeVerification.deleteOne();
   } catch (error) {
@@ -305,20 +306,24 @@ exports.updateAccount = async (req, res) => {
   const { email, profilePic } = req.body;
 
   // find user account
-  const userDetails =  await User.findOne({email})
+  const userDetails = await User.findOne({ email });
 
   if (profilePic) {
     // upload profile pic
-    handleImgUpload(profilePic).then(async (profilePicture) => {   
+    handleImgUpload(profilePic).then(async (profilePicture) => {
       await User.updateOne(
         { email: email },
         { $set: { profilePic: profilePicture.secure_url } },
         { new: true }
       );
-      
-      // send userDetails
-      res.status(200).json({ message: "profile picture has been successfully updated", userDetails})
-    });
 
+      // send userDetails
+      res
+        .status(200)
+        .json({
+          message: "profile picture has been successfully updated",
+          userDetails,
+        });
+    });
   }
 };

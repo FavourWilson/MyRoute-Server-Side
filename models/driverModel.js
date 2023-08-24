@@ -16,11 +16,15 @@ const DriverSchema = new Schema({
   },
   vehicle_Model: {
     type: String,
-    required: [true, "vehicle model cannot be empty"],
+    required: [true, "Vehicle model cannot be empty"],
   },
   vehicle_year: {
     type: String,
     required: [true, "Vehicle year cannot be empty"],
+  },
+  vehicle_color: {
+    type: String,
+    required: [true, "Vehicle color cannot be empty"],
   },
   plate_number_license: {
     type: String,
