@@ -1,6 +1,6 @@
 const path = require("path");
 const { catchAsync } = require("../utils/catchAsync");
-const Bank = require("../models/bankmodel");
+const Bank = require("../models/bank-model");
 
 
 

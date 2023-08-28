@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema
 
 // define the token schema
-const codeVerificationSchema = new Schema({
+const OTP= new Schema({
   email: {
     type: String,
     require: true
   },
-  verificationCode: {
+  OTP: {
     type: Number,
     required: true,
   },
@@ -19,5 +19,5 @@ const codeVerificationSchema = new Schema({
   },
 });
 
-const CodeVerification = mongoose.model("code_verification", codeVerificationSchema);
-module.exports = CodeVerification
+const OTPCode = mongoose.model("OTP", OTP);
+module.exports = OTPCode
