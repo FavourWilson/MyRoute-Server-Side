@@ -10,7 +10,7 @@ const doesUserExist = async (email, route) => {
       const oldUser = await User.findOne({ email });
       return oldUser;
     }
-  
+
     case "login": {
       const oldUser = await User.findOne({ email });
       return oldUser;
@@ -26,17 +26,10 @@ const getUser = async (userQuery, type) => {
   switch (type) {
     case "email":
       const getUserByEmail = await User.findOne({ email: userQuery });
-
-      if (!getUserByEmail)
-        return res
-          .status(404)
-          .json(helpers.sendError("Email does not exist", 404));
       return getUserByEmail;
 
     case "ID":
       const getUserByID = await User.findById({ _id: userQuery });
-      if (getUserByID) return;
-
       return getUserByID;
   }
 };
@@ -44,21 +37,30 @@ const getUser = async (userQuery, type) => {
 // find token
 const _OTP = async (email, type) => {
   switch (type) {
-    case "find-and-delete": {
-      const token = await OTP.findOne({ email });
-      if (token) await OTP.deleteOne();
-    }
+    case "find-and-delete":
+      {
+        const token = await OTP.findOne({ email });
+        if (token) await OTP.deleteOne();
+      }
+      break;
 
     case "find": {
-      const token = await OTP.findOne({ email });
-      if (!token) return "Invalid or expired password reset token";
-      // return res.status(404).json(helpers.sendError("Invalid or expired password reset token", 404));
+      const OTPCode = await OTP.findOne({ email });
+      return OTPCode;
     }
   }
 };
 
 // create new user
-const createNewUser = async (firstName, lastName, email, phone, gender, password, ninDocument ) => {
+const createNewUser = async (
+  firstName,
+  lastName,
+  email,
+  phone,
+  gender,
+  password,
+  ninDocument
+) => {
   const newUser = await User.create({
     firstName,
     lastName,
@@ -93,42 +95,41 @@ const updateProfile = async (email, value, type) => {
         { $set: { password: value } },
         { new: true }
       );
-    break;
+      break;
     case "user-verification-update":
       await User.updateOne(
         { email: email },
         { $set: { isVerified: value } },
         { new: true }
       );
-    break;
-    case "update-profile-image":
-      const profileUpdate = await User.updateOne(
+      break;
+    case "profile-image-update":
+      await User.updateOne(
         { email: email },
         { $set: { profilePic: value } },
         { new: true }
       );
 
-      return profileUpdate;
+      break; 
     default:
       console.log("");
   }
 };
 
-
 // Reset OTP
 const findResetOTP = async (email) => {
   let passwordResetOTP = await ResetOTP.findOne({ email });
 
-  return passwordResetOTP
-}
+  return passwordResetOTP;
+};
 
 const deleteResetOTP = async (email) => {
   await ResetOTP.findOneAndDelete({ email });
-}
+};
 
 const createResetOtp = async (email, hash) => {
-  deleteResetOTP(email)
-  
+  deleteResetOTP(email);
+
   await new ResetOTP({
     email: email,
     OTP: hash,

@@ -61,7 +61,7 @@ const resetPassword = async (email, OTP, password) => {
   let passwordResetOTP = await userRepository.findResetOTP(email);
 
   const isValid = await bcrypt.compare(OTP, passwordResetOTP.OTP);
-  if (!isValid) return res.status(404).json(helpers.sendError("Invalid or expired password reset token", 404));
+  if (!isValid) return { message: "Invalid or expired password reset token"}
 
   // hash the new password
   const hash = await bcrypt.hash(password, Number(bcryptSalt));
@@ -73,17 +73,20 @@ const resetPassword = async (email, OTP, password) => {
   return getUserEmail
 };
 
-const verifyUser = async(email, OTP) => {
-  await userRepository.getUser(email, "email");
+// verify OTP
+const verifyUser = async (email, OTP) => {
+  const user =  await userRepository.getUser(email, "email");
+  if (user == null) return { message: "User does not exist"};
 
   // check if codeVerification is valid
-  const OTPCode = await userRepository.token(email, "find");
-
-  if (OTP !== OTPCode.OTP) return res.status(400).json(helpers.sendError("Not successfully verified", 400));
-  res.status(200).json(helpers.sendSuccess("Verification code successfully verified", 200));
-
-  await userRepository.updateProfile(user, true, "user-verification-update");
-  await userRepository.token(email, "find-and-delete")
+  const OTPCode = await userRepository._OTP(email, "find");
+  
+  if (OTPCode == null) return {message: "Invalid or expired verification code"}
+  if (OTP !== OTPCode.OTP) return {message: "Not successfully verified"}
+  
+  await userRepository.updateProfile(email, true, "user-verification-update");
+  await userRepository._OTP(email, "find-and-delete")
+  return {}
 }
 
 const resendOtp = async (email) => {
@@ -99,14 +102,16 @@ const resendOtp = async (email) => {
 
 // update account handler
 const updateAccount = async(email, profilePic, type) => {
-  const getUser =  await userRepository.getUser(email, "email")
-  
   if (profilePic) {
-    handleImageUpload(profilePic).then(async (profilePicture) => {
-      const updatedProfile = await userRepository.updateProfile(email, profilePicture.secure_url, type)
-
-      res.status(200).json( helpers.sendSuccess("profile picture has been successfully updated", 200), updatedProfile.profileUpdate);
+    const updateProfileImage =  handleImageUpload(profilePic).then(async (profilePicture) => {
+      await userRepository.updateProfile(email, profilePicture.secure_url, type)
+      const getUser =  await userRepository.getUser(email, "email")
+  
+      return { messageString: "profile picture has been successfully updated", getUser}
+      
     });
+
+    return updateProfileImage
   }
 }
 
