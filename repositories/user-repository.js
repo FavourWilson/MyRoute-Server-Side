@@ -5,33 +5,27 @@ const helpers = require("../helpers");
 // check if user exist
 const doesUserExist = async (email, route) => {
   switch (route) {
-    case "signUp": {
+    case "signup": {
       const oldUser = await User.findOne({ email });
-      if (oldUser)
-        return res
-          .status(403)
-          .json(helpers.sendError("User already exist", 403));
+      return oldUser
     }
 
     case "login": {
       const oldUser = await User.findOne({ email });
-      if (oldUser) return oldUser;
+      return oldUser
     }
 
-    default:
-      res
-        .status(500)
-        .json({ message: "pass in the specific route for this handler" });
+    default: return "pass in the specific route for this handler";
   }
 };
 
 // get user email
-const getUser = async (userQuery, type) => {
+const getUser = async (userQuery, type, res) => {
   switch (type) {
     case "email":
       const getUserByEmail = await User.findOne({ email: userQuery});
 
-      if (!getUserByEmail) return helpers.sendError("Email does not exist", 404);
+      if (!getUserByEmail) return res.status(404).json(helpers.sendError("Email does not exist", 404));
       return getUserByEmail;
 
     case "ID":
@@ -52,12 +46,8 @@ const token = async (email, type) => {
 
     case "find": {
       const token = await OTP.findOne({ email });
-      if (!token)
-        return res
-          .status(404)
-          .json(
-            helpers.sendError("Invalid or expired password reset token", 404)
-          );
+      if (!token) return "Invalid or expired password reset token"
+        // return res.status(404).json(helpers.sendError("Invalid or expired password reset token", 404));
     }
   }
 };

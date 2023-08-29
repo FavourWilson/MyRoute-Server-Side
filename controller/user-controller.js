@@ -8,8 +8,13 @@ const { catchAsync } = require("../utils/catchAsync");
 exports.login = catchAsync(async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const oldUser = await userServices.loginUser(email, password);
-    helpers.createSendToken(res, 200, oldUser);
+    
+    const user = await userServices.loginUser(email, password);
+
+    if(!user.hasOwnProperty("oldUser") && !user.hasOwnProperty("isPasswordCorrect")) return helpers.createSendToken(res, 200, user);  
+    if(user.oldUser == false) return res.status(404).json(helpers.sendError("User doesn't exist", 404));
+    if(user.isPasswordCorrect == false) return res.status(400).json(helpers.sendError("Invalid credentials", 400));
+
   } catch (error) {
     return next(new appError(error.toString(), 500));
   }
@@ -19,10 +24,12 @@ exports.login = catchAsync(async (req, res, next) => {
 exports.signUp = catchAsync(async (req, res, next) => {
   try {
     const { firstName, lastName, email, phone, gender, password, ninDocument } = req.body;
+    
     const user = await userServices.createUser(firstName, lastName, email, phone, gender, password, ninDocument);
-    createSendToken(res, 201, user.newUser);
+    if (user.oldUser) return res.status(403).json(helpers.sendError("User already exist", 403));
 
-    // send a message for verifying the OTP
+    helpers.createSendToken(res, 201, user.newUser);
+
     mailer.sendVerificationCode(email, "Verify your account", {
       name: firstName,
       verificationCode: user.registeredOTP,
@@ -40,7 +47,6 @@ exports.forgetPassword = async (req, res) => {
     const user = await userServices.forgotPassword(email);
     const link = `${clientURL}/passwordReset?token=${resetToken}&id=${user._id}`;
 
-    // send a forget password mail
     mailer.forgetPasswordMail(user.email, "Password Reset Request", { link, name: user.firstName});
 
     res.status(200).json(helpers.sendSuccess("message sent successfully, check your mail", 200));
@@ -55,11 +61,8 @@ exports.resetPassword = async (req, res) => {
     const { email, token, password } = req.body;
 
     const user = await userServices.resetPassword(email, token, password);
-    resetPasswordMail(user.email, "Password Reset Successfully", {
-      name: user.firstName,
-    });
+    resetPasswordMail(user.email, "Password Reset Successfully", { name: user.firstName });
 
-    // delete password reset OTP after use
     await passwordResetToken.deleteOne();
     res.status(200).json({ message: "Password reset was successful" });
   } catch (err) {
@@ -70,6 +73,7 @@ exports.resetPassword = async (req, res) => {
 // Handle verify user
 exports.verifyUser = async (req, res) => {
   const { email, OTP } = req.body;
+
   try {
     await userServices.verifyUser(email, OTP);
   } catch (error) {

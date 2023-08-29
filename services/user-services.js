@@ -6,21 +6,24 @@ const helpers = require("../helpers");
 
 // signup user services
 const createUser = async (firstName, lastName, email, phone, gender, password, ninDocument) => {
-  await userRepository.doesUserExist(email, "signup");
+  const oldUser =  await userRepository.doesUserExist(email, "signup");
+  if(oldUser) return { oldUser }
+
+  const OTPCode =  helpers.OTP()
 
   // upload nin to cloudinary and create account
   const handleUpload = handleImageUpload(ninDocument)
     .then(async (ninDocument) => {
       const newUser = await userRepository.createNewUser(firstName, lastName, email, phone, gender, password, ninDocument.secure_url);
-      const registeredOTP = await userRepository.createRegisterOtp(user.email);
+      const registeredOTP = await userRepository.createRegisterOtp(email, OTPCode);
 
       return {
         newUser,
-        registeredOTP,
+        registeredOTP
       };
     })
     .catch((err) => {
-      helpers.sendError("server Error", 500);
+      console.log(err)
     });
 
   return handleUpload;
@@ -29,12 +32,13 @@ const createUser = async (firstName, lastName, email, phone, gender, password, n
 // login user services
 const loginUser = async (email, password) => {
   const userInfo = await userRepository.doesUserExist(email, "login");
+  if(!userInfo) return { oldUser: false }
 
   // compare password
   const isPasswordCorrect = await bcrypt.compare( password, userInfo.password);
-  
-  if (!isPasswordCorrect) return res.status(400).json({ message: "Invalid credentials" });
-  return userInfo;
+  if (!isPasswordCorrect) return {isPasswordCorrect: false};
+
+  return userInfo
 };
 
 // forget password
@@ -97,8 +101,8 @@ const resendOtp = async (email) => {
 
 // update account handler
 const updateAccount = async(email, profilePic, type) => {
-  await userRepository.getUser(email, "email")
-
+  const getUser =  await userRepository.getUser(email, "email")
+  
   if (profilePic) {
     handleImageUpload(profilePic).then(async (profilePicture) => {
       const updatedProfile = await userRepository.updateProfile(email, profilePicture.secure_url, type)

@@ -24,8 +24,11 @@ const options={
 	apis:['./route/*.js']
 }
 mongoose.set("strictQuery", false);
-mongoose
-	.connect(dbString)
+mongoose.connect(dbString, {
+		useUnifiedTopology: true,
+        useNewUrlParser: true,
+        autoIndex: true
+	})
 	.then((conn) => console.log(conn.connection._connectionString))
 	.catch((err) => console.error(err));
 
