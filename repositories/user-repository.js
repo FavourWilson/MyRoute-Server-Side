@@ -1,7 +1,6 @@
 const User = require("../models/user-model");
 const OTP = require("../models/OTP-model");
 const ResetOTP = require("../models/reset-OTP-model");
-const helpers = require("../helpers");
 
 // check if user exist
 const doesUserExist = async (email, route) => {
@@ -116,7 +115,7 @@ const updateProfile = async (email, value, type) => {
   }
 };
 
-// Reset OTP
+// Reset OTP handler
 const findResetOTP = async (email) => {
   let passwordResetOTP = await ResetOTP.findOne({ email });
 
@@ -137,15 +136,6 @@ const createResetOtp = async (email, hash) => {
   }).save();
 };
 
-// const getCodebyEmail = async (email) => {};
-
-// const activateEmail = async (email) => {};
-
-// const validateResetCode = async (email, code) => {};
-
-// const updateResetStatus = async (email, code) => {};
-
-// const updatePassword = async (email, password) => {};
 
 module.exports = {
   getUser,

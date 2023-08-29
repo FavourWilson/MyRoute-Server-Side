@@ -36,7 +36,6 @@ const loginUser = async (email, password) => {
   const userInfo = await userRepository.doesUserExist(email, "login");
   if(!userInfo) return { oldUser: false }
 
-  // compare password
   const isPasswordCorrect = await bcrypt.compare( password, userInfo.password);
   if (!isPasswordCorrect) return {isPasswordCorrect: false};
 
@@ -90,7 +89,6 @@ const verifyUser = async (email, OTP) => {
 }
 
 const resendOtp = async (email) => {
-  // create verification code
   const OTP = helpers.OTP()
 
   const user =  await userRepository.getUser(email, "email");
@@ -103,7 +101,7 @@ const resendOtp = async (email) => {
 // update account handler
 const updateAccount = async(email, profilePic, type) => {
   if (profilePic) {
-    const updateProfileImage =  handleImageUpload(profilePic).then(async (profilePicture) => {
+    const updateProfileImage = handleImageUpload(profilePic).then(async (profilePicture) => {
       await userRepository.updateProfile(email, profilePicture.secure_url, type)
       const getUser =  await userRepository.getUser(email, "email")
   
