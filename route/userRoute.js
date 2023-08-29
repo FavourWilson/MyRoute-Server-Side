@@ -1,5 +1,5 @@
 const express = require("express");
-const { login, signUp, verifyUser, resendCode, forgetPassword, resetPassword, updateAccount } = require("../controller/userController");
+const { login, signUp, verifyOTP, resendOTP, forgetPassword, resetPassword, updateAccount } = require("../controller/user-controller");
 
 const Router = express.Router();
 
@@ -177,7 +177,7 @@ Router.route("/signup").post(signUp)
  *         description: Some server error
  *
  */
-Router.route("/verify-user").post(verifyUser)
+Router.route("/verify-user").post(verifyOTP)
 
 
 /**
@@ -229,7 +229,7 @@ Router.route("/verify-user").post(verifyUser)
  *         description: Some server error
  *
  */
-Router.route("/resend-code").post(resendCode)
+Router.route("/resend-code").post(resendOTP)
 
 /**
  * @swagger

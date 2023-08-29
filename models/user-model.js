@@ -39,7 +39,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, "Password cannot be empty"],
   },
-  isActive: { type: Boolean, default: false },
+  isVerified: {type: Boolean, default: false}
 });
 
 UserSchema.pre("save", async function (next) {

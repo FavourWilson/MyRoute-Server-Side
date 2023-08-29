@@ -1,5 +1,5 @@
 const { catchAsync } = require("../utils/catchAsync");
-const Car = require("../models/carModel");
+const Car = require("../models/car-model");
 
 
 exports.createCar = catchAsync(async (req, res, next) => {

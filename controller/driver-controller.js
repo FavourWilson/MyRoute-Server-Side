@@ -1,7 +1,7 @@
 const appError = require("../utils/appError");
 const { catchAsync } = require("../utils/catchAsync");
 
-const Driver = require("../models/driverModel")
+const Driver = require("../models/driver-model")
 const handleImgUpload = require("../utils/cloudinary/cloudinary");
 
 // Create driver API

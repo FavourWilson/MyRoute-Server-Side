@@ -1,5 +1,5 @@
 const express = require("express");
-const {createDriver} = require("../controller/driverController");
+const {createDriver} = require("../controller/driver-controller");
 
 const Router = express.Router();
 

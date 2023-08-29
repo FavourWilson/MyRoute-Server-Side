@@ -1,6 +1,6 @@
 const path = require("path");
 const { catchAsync } = require("../utils/catchAsync");
-const Card = require("../models/cardModel");
+const Card = require("../models/card-model");
 
 
 

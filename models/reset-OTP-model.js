@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema
 
 // define the token schema
-const tokenSchema = new Schema({
+const ResetOTPSchema = new Schema({
   email: {
     type: String,
     require: true
   },
-  token: {
+  OTP: {
     type: String,
     required: true,
   },
@@ -19,5 +19,5 @@ const tokenSchema = new Schema({
   },
 });
 
-const Token = mongoose.model("token", tokenSchema);
-module.exports = Token
+const ResetOTP = mongoose.model("resetotp", ResetOTPSchema);
+module.exports = ResetOTP
