@@ -4,6 +4,8 @@ const userRepository = require("../repositories/user-repository");
 const handleImageUpload = require("../config/cloudinary-config");
 const helpers = require("../helpers");
 
+const bcryptSalt = process.env.BCRYPT_SALT;
+
 // signup user services
 const createUser = async (firstName, lastName, email, phone, gender, password, ninDocument) => {
   const oldUser =  await userRepository.doesUserExist(email, "signup");
@@ -44,34 +46,30 @@ const loginUser = async (email, password) => {
 // forget password
 const forgotPassword = async (email) => {
   const userInfo = await userRepository.getUser(email, "email");
-  await userRepository.findToken(email, "find-and-delete");
+  await userRepository._OTP(email, "find-and-delete");
 
   // implementing a reset token and hashing it using bcrypt
-  let resetToken = crypto.randomBytes(32).toString("hex");
-  const hash = await bcrypt.hash(resetToken, Number(process.env.BCRYPT_SALT));
+  let resetOTP = crypto.randomBytes(32).toString("hex");
+  const hash = await bcrypt.hash(resetOTP, Number(bcryptSalt));
 
-  await new Token({
-    email: email,
-    token: hash,
-    createdAt: Date.now(),
-  }).save();
+  await userRepository.createResetOtp(email, hash)
 
-  return userInfo;
+  return {userInfo, resetOTP};
 };
 
-const resetPassword = async (email, token, password) => {
-  let passwordResetToken = await userRepository.token(email, "find");
-  
-  // compare code
-  const isValid = await bcrypt.compare(token, passwordResetToken.token);
+const resetPassword = async (email, OTP, password) => {
+  let passwordResetOTP = await userRepository.findResetOTP(email);
+
+  const isValid = await bcrypt.compare(OTP, passwordResetOTP.OTP);
   if (!isValid) return res.status(404).json(helpers.sendError("Invalid or expired password reset token", 404));
 
   // hash the new password
   const hash = await bcrypt.hash(password, Number(bcryptSalt));
 
   await userRepository.updateProfile(email, hash, "password-update")
+  await userRepository.deleteResetOTP(email);
 
-  const getUserEmail = await userRepository.getUserByEmail(email)
+  const getUserEmail = await userRepository.getUser(email, "email")
   return getUserEmail
 };
 

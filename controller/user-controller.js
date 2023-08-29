@@ -45,10 +45,9 @@ exports.forgetPassword = async (req, res) => {
     const { email, clientURL } = req.body;
 
     const user = await userServices.forgotPassword(email);
-    const link = `${clientURL}/passwordReset?token=${resetToken}&id=${user._id}`;
+    const link = `${clientURL}/passwordReset?token=${user.resetOTP}&id=${user.userInfo._id}`;
 
-    mailer.forgetPasswordMail(user.email, "Password Reset Request", { link, name: user.firstName});
-
+    mailer.forgetPasswordMail(user.userInfo.email, "Password Reset Request", { link, name: user.userInfo.firstName});
     res.status(200).json(helpers.sendSuccess("message sent successfully, check your mail", 200));
   } catch (err) {
     console.log(err);
@@ -58,12 +57,11 @@ exports.forgetPassword = async (req, res) => {
 // Handle user password reset
 exports.resetPassword = async (req, res) => {
   try {
-    const { email, token, password } = req.body;
+    const { email, OTP, password } = req.body;
 
-    const user = await userServices.resetPassword(email, token, password);
-    resetPasswordMail(user.email, "Password Reset Successfully", { name: user.firstName });
+    const user = await userServices.resetPassword(email, OTP, password);
+    mailer.resetPasswordMail(user.email, "Password Reset Successfully", { name: user.firstName });
 
-    await passwordResetToken.deleteOne();
     res.status(200).json({ message: "Password reset was successful" });
   } catch (err) {
     console.log(err);
