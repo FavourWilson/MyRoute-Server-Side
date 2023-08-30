@@ -104,7 +104,7 @@ const updateAccount = async(email, body) => {
       await userRepository.updateProfile(email, profilePicture.secure_url, "profile-image-update")
       // const getUser =  await userRepository.getUser(email, "email")
   
-      return { messageString: "profile picture has been successfully updated", getUser}
+      return { messageString: "profile picture has been successfully updated"}
       
     });
 

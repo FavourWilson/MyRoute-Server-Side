@@ -37,7 +37,7 @@ const createDriverAccount = async (
     bankName,
   }).save();
 
- console.log(driver)
+ return driver
 };
 
 module.exports = {

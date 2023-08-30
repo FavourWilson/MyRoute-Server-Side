@@ -24,7 +24,7 @@ exports.createDriver = catchAsync(async (req, res, next) => {
       bankName,
     } = req.body;
 
-   await driverServices.createDriver(
+    const _createDriver =  await driverServices.createDriver(
       userId,
       referralCode,
       vehicleManufacturer,
@@ -43,7 +43,8 @@ exports.createDriver = catchAsync(async (req, res, next) => {
       bankName,
     )
 
-    // res.status(201).json(helpers.sendSuccess("driver registration successful", 201))
+    if(_createDriver) 
+      return res.status(201).json(helpers.sendSuccess("driver registration successful", 201))
     
   } catch (error) {
     console.error(error);
