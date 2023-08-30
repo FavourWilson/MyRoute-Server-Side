@@ -12,7 +12,7 @@ const createDriverAccount = async (
   driverLicense,
   driverLicenseExpiryDate,
   outSideCarPhoto,
-  inSide_Car_Photo,
+  inSideCarPhoto,
   address,
   bankAccountHolderName,
   bankAccountNumber,
@@ -30,14 +30,14 @@ const createDriverAccount = async (
     driverLicense,
     driverLicenseExpiryDate,
     outSideCarPhoto,
-    inSide_Car_Photo,
+    inSideCarPhoto,
     address,
     bankAccountHolderName,
     bankAccountNumber,
     bankName,
   }).save();
 
-  return driver
+ console.log(driver)
 };
 
 module.exports = {

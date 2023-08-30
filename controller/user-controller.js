@@ -28,18 +28,9 @@ exports.login = catchAsync(async (req, res, next) => {
 // Handle user signup
 exports.signUp = catchAsync(async (req, res, next) => {
   try {
-    const { firstName, lastName, email, phone, gender, password, ninDocument } =
-      req.body;
+    const { firstName, lastName, email, phone, gender, password, ninDocument } = req.body;
 
-    const user = await userServices.createUser(
-      firstName,
-      lastName,
-      email,
-      phone,
-      gender,
-      password,
-      ninDocument
-    );
+    const user = await userServices.createUser( firstName, lastName, email, phone, gender, password, ninDocument);
     if (user.oldUser)
       return res.status(403).json(helpers.sendError("User already exist", 403));
 
@@ -81,10 +72,7 @@ exports.resetPassword = async (req, res) => {
     if (user.message == "Invalid or expired password reset token")
       return res.status(404).json(helpers.sendError("Invalid or expired password reset token", 404));
 
-    mailer.resetPasswordMail(user.email, "Password Reset Successfully", {
-      name: user.firstName,
-    });
-
+    mailer.resetPasswordMail(user.email, "Password Reset Successfully", { name: user.firstName });
     res.status(200).json({ message: "Password reset was successful" });
   } catch (err) {
     console.log(err);
@@ -98,7 +86,7 @@ exports.verifyOTP = async (req, res) => {
   try {
     const userOTPVerification = await userServices.verifyUser(email, OTP);
 
-    if (!userOTPVerification.hasOwnProperty("message"))
+    if (!userOTPVerification.message == "OTP successfully verified")
       return res.status(200).json(helpers.sendSuccess("OTP successfully verified", 200));
 
     if (userOTPVerification.message == "User does not exist")
@@ -133,8 +121,6 @@ exports.resendOTP = async (req, res) => {
 
 // Handle user account update
 exports.updateAccount = async (req, res) => {
-  const { email, profilePic } = req.body;
-
-  const updatesOnUser = await userServices.updateAccount( email, profilePic, "profile-image-update");
+  const updatesOnUser = await userServices.updateAccount( req.body.email, req.body);
   res.status(200).json(helpers.sendSuccess(updatesOnUser, 200));
 };
