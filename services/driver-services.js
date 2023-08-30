@@ -25,7 +25,10 @@ exports.createDriver = async (
   const uploadDriverLicence =  await handleImageUpload(driverLicense)
   const uploadOutsideCarPhoto =  await handleImageUpload(outSideCarPhoto)
   const uploadInsideCarPhoto =  await handleImageUpload(inSideCarPhoto)
-  
+
+  const driverProfile =  await driverRepository.findDriverProfile(userId)
+  if(driverProfile) return "You are already a registered driver"
+
   const driver =  await driverRepository.createDriverAccount(
     userId,
     referralCode,
