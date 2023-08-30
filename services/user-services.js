@@ -6,7 +6,7 @@ const helpers = require("../helpers");
 
 const bcryptSalt = process.env.BCRYPT_SALT;
 
-// signup user services
+// user signup handler
 const createUser = async (firstName, lastName, email, phone, gender, password, ninDocument) => {
   const oldUser =  await userRepository.doesUserExist(email, "signup");
   if(oldUser) return { oldUser }
@@ -19,10 +19,7 @@ const createUser = async (firstName, lastName, email, phone, gender, password, n
       const newUser = await userRepository.createNewUser(firstName, lastName, email, phone, gender, password, ninDocument.secure_url);
       const registeredOTP = await userRepository.createRegisterOtp(email, OTPCode);
 
-      return {
-        newUser,
-        registeredOTP
-      };
+      return { newUser, registeredOTP };
     })
     .catch((err) => {
       console.log(err)
@@ -31,19 +28,18 @@ const createUser = async (firstName, lastName, email, phone, gender, password, n
   return handleUpload;
 };
 
-// login user services
+// login user handler
 const loginUser = async (email, password) => {
   const userInfo = await userRepository.doesUserExist(email, "login");
   if(!userInfo) return { oldUser: false }
 
-  // compare password
   const isPasswordCorrect = await bcrypt.compare( password, userInfo.password);
   if (!isPasswordCorrect) return {isPasswordCorrect: false};
 
   return userInfo
 };
 
-// forget password
+// forget password handler
 const forgotPassword = async (email) => {
   const userInfo = await userRepository.getUser(email, "email");
   await userRepository._OTP(email, "find-and-delete");
@@ -57,6 +53,7 @@ const forgotPassword = async (email) => {
   return {userInfo, resetOTP};
 };
 
+// reset password handler
 const resetPassword = async (email, OTP, password) => {
   let passwordResetOTP = await userRepository.findResetOTP(email);
 
@@ -73,7 +70,7 @@ const resetPassword = async (email, OTP, password) => {
   return getUserEmail
 };
 
-// verify OTP
+// verify OTP handler
 const verifyUser = async (email, OTP) => {
   const user =  await userRepository.getUser(email, "email");
   if (user == null) return { message: "User does not exist"};
@@ -81,16 +78,16 @@ const verifyUser = async (email, OTP) => {
   // check if codeVerification is valid
   const OTPCode = await userRepository._OTP(email, "find");
   
-  if (OTPCode == null) return {message: "Invalid or expired verification code"}
+  if (OTPCode == null) return { message: "Invalid or expired verification code"}
   if (OTP !== OTPCode.OTP) return {message: "Not successfully verified"}
   
   await userRepository.updateProfile(email, true, "user-verification-update");
   await userRepository._OTP(email, "find-and-delete")
-  return {}
+  return {message: "OTP successfully verified"}
 }
 
+// resend OTP handler
 const resendOtp = async (email) => {
-  // create verification code
   const OTP = helpers.OTP()
 
   const user =  await userRepository.getUser(email, "email");
@@ -101,18 +98,20 @@ const resendOtp = async (email) => {
 
 
 // update account handler
-const updateAccount = async(email, profilePic, type) => {
-  if (profilePic) {
-    const updateProfileImage =  handleImageUpload(profilePic).then(async (profilePicture) => {
-      await userRepository.updateProfile(email, profilePicture.secure_url, type)
-      const getUser =  await userRepository.getUser(email, "email")
+const updateAccount = async(email, body) => {
+  if (body.profilePic) {
+    const updateProfileImage = handleImageUpload(body.profilePic).then(async (profilePicture) => {
+      await userRepository.updateProfile(email, profilePicture.secure_url, "profile-image-update")
+      // const getUser =  await userRepository.getUser(email, "email")
   
-      return { messageString: "profile picture has been successfully updated", getUser}
+      return { messageString: "profile picture has been successfully updated"}
       
     });
 
     return updateProfileImage
   }
+
+  
 }
 
 module.exports = {

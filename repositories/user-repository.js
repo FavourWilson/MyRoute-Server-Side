@@ -1,7 +1,6 @@
 const User = require("../models/user-model");
 const OTP = require("../models/OTP-model");
 const ResetOTP = require("../models/reset-OTP-model");
-const helpers = require("../helpers");
 
 // check if user exist
 const doesUserExist = async (email, route) => {
@@ -34,7 +33,7 @@ const getUser = async (userQuery, type) => {
   }
 };
 
-// find token
+// find OTP handler
 const _OTP = async (email, type) => {
   switch (type) {
     case "find-and-delete":
@@ -51,16 +50,8 @@ const _OTP = async (email, type) => {
   }
 };
 
-// create new user
-const createNewUser = async (
-  firstName,
-  lastName,
-  email,
-  phone,
-  gender,
-  password,
-  ninDocument
-) => {
+// create new user handler
+const createNewUser = async ( firstName, lastName, email, phone, gender, password, ninDocument ) => {
   const newUser = await User.create({
     firstName,
     lastName,
@@ -74,7 +65,7 @@ const createNewUser = async (
   return newUser;
 };
 
-// create Register OTP
+// Register OTP handler
 const createRegisterOtp = async (email, code) => {
   _OTP(email, "find-and-delete");
 
@@ -87,6 +78,7 @@ const createRegisterOtp = async (email, code) => {
   return code;
 };
 
+// update profile handler
 const updateProfile = async (email, value, type) => {
   switch (type) {
     case "password-update":
@@ -96,6 +88,7 @@ const updateProfile = async (email, value, type) => {
         { new: true }
       );
       break;
+
     case "user-verification-update":
       await User.updateOne(
         { email: email },
@@ -103,23 +96,23 @@ const updateProfile = async (email, value, type) => {
         { new: true }
       );
       break;
+
     case "profile-image-update":
       await User.updateOne(
         { email: email },
         { $set: { profilePic: value } },
         { new: true }
       );
-
       break; 
+
     default:
-      console.log("");
+      console.log("what field do you want to update");
   }
 };
 
-// Reset OTP
+// Reset OTP handlers
 const findResetOTP = async (email) => {
   let passwordResetOTP = await ResetOTP.findOne({ email });
-
   return passwordResetOTP;
 };
 
@@ -136,16 +129,6 @@ const createResetOtp = async (email, hash) => {
     createdAt: Date.now(),
   }).save();
 };
-
-// const getCodebyEmail = async (email) => {};
-
-// const activateEmail = async (email) => {};
-
-// const validateResetCode = async (email, code) => {};
-
-// const updateResetStatus = async (email, code) => {};
-
-// const updatePassword = async (email, password) => {};
 
 module.exports = {
   getUser,

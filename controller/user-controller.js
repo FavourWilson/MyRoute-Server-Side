@@ -11,19 +11,15 @@ exports.login = catchAsync(async (req, res, next) => {
 
     const user = await userServices.loginUser(email, password);
 
-    if (
-      !user.hasOwnProperty("oldUser") &&
-      !user.hasOwnProperty("isPasswordCorrect")
-    )
+    if (!user.hasOwnProperty("oldUser") && !user.hasOwnProperty("isPasswordCorrect"))
       return helpers.createSendToken(res, 200, user);
 
     if (user.oldUser == false)
       return res.status(404).json(helpers.sendError("User doesn't exist", 404));
 
     if (user.isPasswordCorrect == false)
-      return res
-        .status(400)
-        .json(helpers.sendError("Invalid credentials", 400));
+      return res.status(400).json(helpers.sendError("Invalid credentials", 400));
+
   } catch (error) {
     return next(new appError(error.toString(), 500));
   }
@@ -32,18 +28,9 @@ exports.login = catchAsync(async (req, res, next) => {
 // Handle user signup
 exports.signUp = catchAsync(async (req, res, next) => {
   try {
-    const { firstName, lastName, email, phone, gender, password, ninDocument } =
-      req.body;
+    const { firstName, lastName, email, phone, gender, password, ninDocument } = req.body;
 
-    const user = await userServices.createUser(
-      firstName,
-      lastName,
-      email,
-      phone,
-      gender,
-      password,
-      ninDocument
-    );
+    const user = await userServices.createUser( firstName, lastName, email, phone, gender, password, ninDocument);
     if (user.oldUser)
       return res.status(403).json(helpers.sendError("User already exist", 403));
 
@@ -70,11 +57,7 @@ exports.forgetPassword = async (req, res) => {
       link,
       name: user.userInfo.firstName,
     });
-    res
-      .status(200)
-      .json(
-        helpers.sendSuccess("message sent successfully, check your mail", 200)
-      );
+    res.status(200).json(helpers.sendSuccess("message sent successfully, check your mail", 200));
   } catch (err) {
     console.log(err);
   }
@@ -87,16 +70,9 @@ exports.resetPassword = async (req, res) => {
 
     const user = await userServices.resetPassword(email, OTP, password);
     if (user.message == "Invalid or expired password reset token")
-      return res
-        .status(404)
-        .json(
-          helpers.sendError("Invalid or expired password reset token", 404)
-        );
+      return res.status(404).json(helpers.sendError("Invalid or expired password reset token", 404));
 
-    mailer.resetPasswordMail(user.email, "Password Reset Successfully", {
-      name: user.firstName,
-    });
-
+    mailer.resetPasswordMail(user.email, "Password Reset Successfully", { name: user.firstName });
     res.status(200).json({ message: "Password reset was successful" });
   } catch (err) {
     console.log(err);
@@ -110,25 +86,17 @@ exports.verifyOTP = async (req, res) => {
   try {
     const userOTPVerification = await userServices.verifyUser(email, OTP);
 
-    if (!userOTPVerification.hasOwnProperty("message"))
-      return res
-        .status(200)
-        .json(helpers.sendSuccess("OTP successfully verified", 200));
+    if (!userOTPVerification.message == "OTP successfully verified")
+      return res.status(200).json(helpers.sendSuccess("OTP successfully verified", 200));
 
     if (userOTPVerification.message == "User does not exist")
-      return res
-        .status(404)
-        .json(helpers.sendError("User does not exist", 404));
+      return res.status(404).json(helpers.sendError("User does not exist", 404));
 
     if (userOTPVerification.message == "Not successfully verified")
-      return res
-        .status(400)
-        .json(helpers.sendError("Not successfully verified", 400));
+      return res.status(400).json(helpers.sendError("Not successfully verified", 400));
 
     if (userOTPVerification.message == "Invalid or expired verification code")
-      return res
-        .status(400)
-        .json(helpers.sendError("Invalid or expired verification code", 404));
+      return res.status(400).json(helpers.sendError("Invalid or expired verification code", 404));
   } catch (error) {
     console.log(error);
   }
@@ -153,14 +121,6 @@ exports.resendOTP = async (req, res) => {
 
 // Handle user account update
 exports.updateAccount = async (req, res) => {
-  const { email, profilePic } = req.body;
-
-  // find user account
-  const updatesOnUser = await userServices.updateAccount(
-    email,
-    profilePic,
-    "profile-image-update"
-  );
-
+  const updatesOnUser = await userServices.updateAccount( req.body.email, req.body);
   res.status(200).json(helpers.sendSuccess(updatesOnUser, 200));
 };
