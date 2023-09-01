@@ -65,7 +65,7 @@ const DriverSchema = new Schema({
     default: null,
   },
   bankAccountNumber: {
-    type: Number,
+    type: String,
     required: [true, "Bank account number cannot be empty"],
     default: null,
   },
