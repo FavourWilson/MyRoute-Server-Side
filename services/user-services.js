@@ -34,6 +34,7 @@ const loginUser = async (email, password) => {
   if(!userInfo) return { oldUser: false }
 
   const isPasswordCorrect = await bcrypt.compare( password, userInfo.password);
+
   if (!isPasswordCorrect) return {isPasswordCorrect: false};
 
   return userInfo

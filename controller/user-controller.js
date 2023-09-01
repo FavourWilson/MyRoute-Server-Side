@@ -1,7 +1,6 @@
 const userServices = require("../services/user-services");
 const helpers = require("../helpers");
 const mailer = require("../mailer");
-const appError = require("../utils/appError");
 const { catchAsync } = require("../utils/catchAsync");
 
 // handle user login
@@ -11,8 +10,10 @@ exports.login = catchAsync(async (req, res, next) => {
 
     const user = await userServices.loginUser(email, password);
 
-    if (!user.hasOwnProperty("oldUser") && !user.hasOwnProperty("isPasswordCorrect"))
-      return helpers.createSendToken(res, 200, user);
+    if (!user.hasOwnProperty("oldUser") && !user.hasOwnProperty("isPasswordCorrect")){
+      if(user.isVerified == false) return res.status(401).json(helpers.sendError("Verify your email", 401))
+      return res.status(200).json(helpers.createSendToken(res, 200, user));
+    }
 
     if (user.oldUser == false)
       return res.status(404).json(helpers.sendError("User doesn't exist", 404));
@@ -21,7 +22,7 @@ exports.login = catchAsync(async (req, res, next) => {
       return res.status(400).json(helpers.sendError("Invalid credentials", 400));
 
   } catch (error) {
-    return next(new appError(error.toString(), 500));
+    return console.log(`login Error,${error}`)
   }
 });
 
@@ -41,7 +42,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
       verificationCode: user.registeredOTP,
     });
   } catch (error) {
-    return next(new appError(error.toString(), 500));
+    return console.log(`signup Error,${error} `)
   }
 });
 
