@@ -19,5 +19,6 @@ const OTP = new Schema({
   },
 });
 
+// setup model on mongoose
 const OTPCode = mongoose.model("otp", OTP);
 module.exports = OTPCode
