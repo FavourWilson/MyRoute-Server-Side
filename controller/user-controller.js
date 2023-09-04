@@ -44,7 +44,8 @@ exports.forgetPassword = async (req, res) => {
     mailer.forgetPasswordMail(user.userInfo.email, "Password Reset Request", { link, name: user.userInfo.firstName});
     res.status(200).json(helpers.sendSuccess("message sent successfully, check your mail", 200));
   } catch (err) {
-    console.log(err);
+    if(err.status)
+      return res.status(err.status).json(helpers.sendError(err.message, err.status))
   }
 };
 
@@ -90,8 +91,10 @@ exports.resendOTP = async (req, res) => {
     });
 
     res.status(200).json(helpers.sendSuccess("verification code sent", 200));
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    if(error.status){
+      return res.status(error.status).json(helpers.sendError(error.message, error.status))
+    }
   }
 };
 
