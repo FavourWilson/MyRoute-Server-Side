@@ -24,8 +24,8 @@ exports.signUp = catchAsync(async (req, res, next) => {
     const { firstName, lastName, email, phone, gender, password, ninDocument } = req.body;
 
     const user = await userServices.createUser( firstName, lastName, email, phone, gender, password, ninDocument);
+    
     helpers.createSendToken(res, 201, user.newUser);
-
     mailer.sendVerificationCode(email, "Verify your account", { name: firstName, verificationCode: user.registeredOTP});
   } catch (error) {
     if(error.status)
@@ -52,9 +52,9 @@ exports.forgetPassword = async (req, res) => {
 // Handle user password reset
 exports.resetPassword = async (req, res) => {
   try {
-    const { email, OTP, password } = req.body;
+    const { email, resetOTP, password } = req.body;
 
-    const user = await userServices.resetPassword(email, OTP, password);
+    const user = await userServices.resetPassword(email, resetOTP, password);
 
     mailer.resetPasswordMail(user.email, "Password Reset Successfully", { name: user.firstName });
     res.status(200).json({ message: "Password reset was successful" });
@@ -71,7 +71,6 @@ exports.verifyOTP = async (req, res) => {
   try {
     await userServices.verifyUser(email, OTP);
     return res.status(200).json(helpers.sendSuccess("OTP successfully verified", 200));
-
   } catch (error) {
     if(error.status){
       return res.status(error.status).json(helpers.sendError(error.message, error.status))
@@ -90,7 +89,7 @@ exports.resendOTP = async (req, res) => {
       verificationCode: resendOTP.OTP,
     });
 
-    res.status(200).json(helpers.sendSuccess("verification code sent", 200));
+    res.status(200).json(helpers.sendSuccess("OTP sent, check your mail", 200));
   } catch (error) {
     if(error.status){
       return res.status(error.status).json(helpers.sendError(error.message, error.status))
@@ -101,8 +100,8 @@ exports.resendOTP = async (req, res) => {
 // Handle user account update
 exports.updateAccount = async (req, res) => {
   try{
-    const updatesOnUser = await userServices.updateAccount( req.body.email, req.body);
-    res.status(200).json(helpers.sendSuccess(updatesOnUser, 200));
+    await userServices.updateAccount( req.body.email, req.body);
+    res.status(200).json(helpers.sendSuccess("profile has been successfully updated", 200));
   }catch(error){
     if(error.status)
      return res.status(error.status).json(helpers.sendError(error.message, error.status));

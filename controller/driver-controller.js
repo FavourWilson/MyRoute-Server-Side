@@ -24,7 +24,7 @@ exports.createDriver = catchAsync(async (req, res, next) => {
       bankName,
     } = req.body;
 
-    const _createDriver = await driverServices.createDriver(
+    await driverServices.createDriver(
       userId,
       referralCode,
       vehicleManufacturer,
@@ -43,23 +43,55 @@ exports.createDriver = catchAsync(async (req, res, next) => {
       bankName
     );
 
-    if (_createDriver) {
-      if (_createDriver == "You are already a registered driver")
-        return res
-          .status(400)
-          .json(helpers.sendError("you are already a registered driver", 400));
-
-      return res
-        .status(201)
-        .json(helpers.sendSuccess("driver registration successful", 201));
-    }
-
-    // if(_createDriver !== "You are already a registered driver")
+    return res
+      .status(201)
+      .json(helpers.sendSuccess("driver registration successful", 201));
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      status: "error",
-      error: error.toString(),
-    });
+    if (error.status)
+      return res
+        .status(error.status)
+        .json(helpers.sendError(error.message, error.status));
+  }
+});
+
+// Create driver
+exports.driverBooking = catchAsync(async (req, res, next) => {
+  try {
+    const {
+      userId,
+      pickupLocation,
+      dropOffLocation,
+      whenAreyouGoing,
+      seatsAvailable,
+      currentMapLocation,
+      destination,
+      whatRouteAreYouPassing,
+      whatTimeAreYouGoing,
+      price,
+      paymentMethod,
+    } = req.body;
+
+    await driverServices.driverBooking(
+      userId,
+      pickupLocation,
+      dropOffLocation,
+      whenAreyouGoing,
+      seatsAvailable,
+      currentMapLocation,
+      destination,
+      whatRouteAreYouPassing,
+      whatTimeAreYouGoing,
+      price,
+      paymentMethod
+    );
+
+    return res
+      .status(201)
+      .json(helpers.sendSuccess("driver booking successful saved", 201));
+  } catch (error) {
+    if (error.status)
+      return res
+        .status(error.status)
+        .json(helpers.sendError(error.message, error.status));
   }
 });

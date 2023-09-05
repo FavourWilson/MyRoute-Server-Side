@@ -4,37 +4,42 @@ const ResetOTP = require("../models/reset-OTP-model");
 const handleImageUpload = require("../config/cloudinary-config");
 
 // check if user exist
-const doesUserExist = async (email, route) => {
+const doesUserExist = async (email) => {
   const oldUser = await User.findOne({ email });
   return oldUser;
 };
 
 // get user email
-const getUser = async (userQuery, type) => {
-  switch (type) {
-    case "email":
-      const getUserByEmail = await User.findOne({ email: userQuery });
-      return getUserByEmail;
-
-    case "ID":
-      const getUserByID = await User.findById({ _id: userQuery });
-      return getUserByID;
-  }
+const getUserByEmail = async (email) => {
+  const getUserByEmail = await User.findOne({ email });
+  return getUserByEmail;
 };
 
-const deleteOTP = async (email) => {
-  await OTP.findOneAndDelete({ email })
+const getUserByID = async (_id) => {
+  const getUserByID = await User.findById(_id);
+  return getUserByID; 
 }
 
+const deleteOTP = async (email) => {
+  await OTP.findOneAndDelete({ email });
+};
+
 // find OTP handler
-const _OTP = async (email) => {
+const findOTP = async (email) => {
   const OTPCode = await OTP.findOne({ email });
   return OTPCode;
 };
 
-
 // create new user handler
-const createNewUser = async ( firstName, lastName, email, phone, gender, password, ninDocument ) => {
+const createNewUser = async (
+  firstName,
+  lastName,
+  email,
+  phone,
+  gender,
+  password,
+  ninDocument
+) => {
   const newUser = await User.create({
     firstName,
     lastName,
@@ -50,8 +55,8 @@ const createNewUser = async ( firstName, lastName, email, phone, gender, passwor
 
 // Register OTP handler
 const createRegisterOtp = async (email, code) => {
-  const OTP =  await _OTP(email);
-  if(OTP) deleteOTP(email)
+  const _OTP = await findOTP(email);
+  if (_OTP) deleteOTP(email);
 
   await new OTP({
     email: email,
@@ -63,29 +68,60 @@ const createRegisterOtp = async (email, code) => {
 };
 
 // update profile handler
-const updateUserProfile = async (email, body, type) => {
-  const userInfo = await User.findOne({email})
+const updateUserProfile = async (email, body) => {
+  const userInfo = await User.findOne({ email });
 
-  let profilePic;
+  let _email = body.email ? body.email : userInfo.email;
+  let _firstName = body.firstName ? body.firstName : userInfo.firstName;
+  let _lastName = body.lastName ? body.lastName : userInfo.lastName;
+  let _ninDocument = body.ninDocument 
+    ? await handleImageUpload(body.ninDocument) 
+    : userInfo.ninDocument;
+  let _phone = body.phone ? body.phone : userInfo.phone;
+  let _gender = body.gender ? body.gender : userInfo.gender;
+  let _profilePic = body.profilePic
+    ? await handleImageUpload(body.profilePic)
+    : userInfo.profilePic;
+  let _password = body.password ? body.password : userInfo.password;
+  let _isVerified = body.isVerified ? body.isVerified : userInfo.isVerified;
+
+  // if profile picture is updated
   if(body.profilePic){
-    const profilepicture = await handleImageUpload(body.profilePic)
-    profilePic = profilepicture.secure_url
-  } else{
-    userInfo.profilePic
+    const updateProfile =  await User.findOneAndUpdate(
+      { email },
+      {
+        email: _email,
+        firstName: _firstName,
+        lastName: _lastName,
+        profilePic: _profilePic.secure_url,
+        ninDocument: _ninDocument,
+        phone: _phone,
+        gender: _gender,
+        password: _password,
+        isVerified: _isVerified,
+      },
+      { new: true }
+    );
+    return updateProfile
   }
-  
-  let email = (body.email) ? body.email : userInfo.email;
-  let firstName = (body.firstName) ? body.firstName : userInfo.firstName;
-  let lastName = (body.lastName) ? body.lastName : userInfo.lastName;
-  let ninDocument = (body.ninDocument) ? body.ninDocument : userInfo.ninDocument;
-  let phone = (body.phone) ? body.phone : userInfo.phone;
-  let gender = (body.gender) ? body.gender : userInfo.gender;
-  let password = (body.password) ? body.password : userInfo.password;
-  let isVerified = (body.isVerified) ? body.isVerified : userInfo.isVerified;
 
-  User.findOneAndUpdate({email}, 
-    {email, firstName, lastName, profilePic, ninDocument, phone, gender, password, isVerified},
-    {new: true})
+  // if images are not updated
+  const _updateProfile =  await User.findOneAndUpdate(
+    { email },
+    {
+      email: _email,
+      firstName: _firstName,
+      lastName: _lastName,
+      profilePic: _profilePic.secure_url,
+      ninDocument: _ninDocument,
+      phone: _phone,
+      gender: _gender,
+      password: _password,
+      isVerified: _isVerified,
+    },
+    { new: true }
+  );
+  return _updateProfile  
 };
 
 // Reset OTP handlers
@@ -109,7 +145,7 @@ const createResetOtp = async (email, hash) => {
 };
 
 module.exports = {
-  getUser,
+  getUserByEmail,
   createNewUser,
   createRegisterOtp,
   createResetOtp,
@@ -117,6 +153,7 @@ module.exports = {
   doesUserExist,
   updateUserProfile,
   findResetOTP,
-  _OTP,
-  deleteOTP
+  findOTP,
+  deleteOTP,
+  getUserByID
 };
