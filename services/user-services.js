@@ -8,42 +8,38 @@ const bcryptSalt = process.env.BCRYPT_SALT;
 
 // user signup handler
 const createUser = async (firstName, lastName, email, phone, gender, password, ninDocument) => {
-  const oldUser =  await userRepository.doesUserExist(email, "signup");
-  if(oldUser) return { oldUser }
+  const oldUser =  await userRepository.doesUserExist(email);
+  if(oldUser) return helpers.newError("Email already exist", 403)
 
   const OTPCode =  helpers.OTP()
 
   // upload nin to cloudinary and create account
-  const handleUpload = handleImageUpload(ninDocument)
-    .then(async (ninDocument) => {
-      const newUser = await userRepository.createNewUser(firstName, lastName, email, phone, gender, password, ninDocument.secure_url);
-      const registeredOTP = await userRepository.createRegisterOtp(email, OTPCode);
+  const nin = await handleImageUpload(ninDocument)
+  const newUser = await userRepository.createNewUser(firstName, lastName, email, phone, gender, password, nin.secure_url);
+  const registeredOTP = await userRepository.createRegisterOtp(email, OTPCode);
 
-      return { newUser, registeredOTP };
-    })
-    .catch((err) => {
-      console.log(err)
-    });
-
-  return handleUpload;
+  return { newUser, registeredOTP };
 };
 
 // login user handler
 const loginUser = async (email, password) => {
-  const userInfo = await userRepository.doesUserExist(email, "login");
-  if(!userInfo) return { oldUser: false }
+  const userInfo = await userRepository.doesUserExist(email);
+  if(!userInfo) return helpers.newError("User doesn't exist", 404)  
 
   const isPasswordCorrect = await bcrypt.compare( password, userInfo.password);
-
-  if (!isPasswordCorrect) return {isPasswordCorrect: false};
+  if (!isPasswordCorrect) return helpers.newError("Invalid credentials", 400)
 
   return userInfo
 };
 
 // forget password handler
 const forgotPassword = async (email) => {
-  const userInfo = await userRepository.getUser(email, "email");
-  await userRepository._OTP(email, "find-and-delete");
+  const userInfo = await userRepository.getUserByEmail(email);
+  if(!userInfo) return helpers.newError("User doesn't exist", 404)
+
+  // find and delete previous OTP
+  await userRepository.findOTP(email);
+  await userRepository.deleteOTP(email)
 
   // implementing a reset token and hashing it using bcrypt
   let resetOTP = crypto.randomBytes(32).toString("hex");
@@ -56,42 +52,43 @@ const forgotPassword = async (email) => {
 
 // reset password handler
 const resetPassword = async (email, OTP, password) => {
+  const userInfo = await userRepository.getUserByEmail(email);
+  if(!userInfo) return helpers.newError("User doesn't exist", 404)
+
   let passwordResetOTP = await userRepository.findResetOTP(email);
+  if(passwordResetOTP == null) return helpers.newError("password reset OTP expired", 404)
 
   const isValid = await bcrypt.compare(OTP, passwordResetOTP.OTP);
-  if (!isValid) return { message: "Invalid or expired password reset token"}
+  if (!isValid) return helpers.newError("Invalid or expired reset token", 404);
 
   // hash the new password
   const hash = await bcrypt.hash(password, Number(bcryptSalt));
 
-  await userRepository.updateProfile(email, hash, "password-update")
+  await userRepository.updateUserProfile(email, {password: hash})
   await userRepository.deleteResetOTP(email);
-
-  const getUserEmail = await userRepository.getUser(email, "email")
-  return getUserEmail
 };
 
 // verify OTP handler
 const verifyUser = async (email, OTP) => {
-  const user =  await userRepository.getUser(email, "email");
-  if (user == null) return { message: "User does not exist"};
+  const user =  await userRepository.getUserByEmail(email, "email");
+  if (user == null) return helpers.newError("User does not exist", 404);
 
   // check if codeVerification is valid
-  const OTPCode = await userRepository._OTP(email, "find");
+  const OTPCode = await userRepository.findOTP(email);
   
-  if (OTPCode == null) return { message: "Invalid or expired verification code"}
-  if (OTP !== OTPCode.OTP) return {message: "Not successfully verified"}
-  
-  await userRepository.updateProfile(email, true, "user-verification-update");
-  await userRepository._OTP(email, "find-and-delete")
-  return {message: "OTP successfully verified"}
+  if (OTPCode == null) return helpers.newError("Invalid or expired OTP", 404)
+  if (OTP !== OTPCode.OTP) return helpers.newError("OTP was not successfully verified") 
+
+  await userRepository.updateUserProfile(email, {isVerified: true});
+  await userRepository.deleteOTP(email)
 }
 
 // resend OTP handler
 const resendOtp = async (email) => {
   const OTP = helpers.OTP()
+  const user =  await userRepository.getUserByEmail(email, "email");
 
-  const user =  await userRepository.getUser(email, "email");
+  if(user == null) return helpers.newError("User does not exist", 404)
   await userRepository.createRegisterOtp(user.email, OTP)
   
   return {OTP, user}
@@ -100,19 +97,13 @@ const resendOtp = async (email) => {
 
 // update account handler
 const updateAccount = async(email, body) => {
-  if (body.profilePic) {
-    const updateProfileImage = handleImageUpload(body.profilePic).then(async (profilePicture) => {
-      await userRepository.updateProfile(email, profilePicture.secure_url, "profile-image-update")
-      // const getUser =  await userRepository.getUser(email, "email")
-  
-      return { messageString: "profile picture has been successfully updated"}
-      
-    });
+  const isProfileUpdated =  await userRepository.updateUserProfile(email, body)
 
-    return updateProfileImage
-  }
+  if(!isProfileUpdated)
+    return helpers.newError("could not update user profile", 500)
 
   
+  return isProfileUpdated  
 }
 
 module.exports = {

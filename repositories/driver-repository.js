@@ -1,10 +1,15 @@
 const Driver = require("../models/driver-model");
+const DriverBooking = require("../models/driver-booking-model");
 
 
 const findDriverProfile = async(userId) => {
   const driverProfile  = await Driver.findOne({ userId })
-  // console.log(driverProfile)
   return driverProfile
+}
+
+const findDriverBooking = async(userId) => {
+  const driverBookingProfile  = await DriverBooking.findOne({ userId })
+  return driverBookingProfile
 }
 
 const createDriverAccount = async (
@@ -26,7 +31,6 @@ const createDriverAccount = async (
   bankName
 ) => {
 
-  findDriverProfile(userId)
   const driver = await new Driver({
     userId,
     referralCode,
@@ -49,7 +53,42 @@ const createDriverAccount = async (
  return driver
 };
 
+const saveDriverBooking = async (
+  userId,
+  pickupLocation,
+  dropOffLocation,
+  whenAreyouGoing,
+  seatsAvailable,
+  currentMapLocation,
+  destination,
+  whatRouteAreYouPassing,
+  whatTimeAreYouGoing,
+  price,
+  paymentMethod
+) => {
+
+  const driverBooking = await new DriverBooking({
+    userId,
+    pickupLocation,
+    dropOffLocation,
+    whenAreyouGoing,
+    seatsAvailable,
+    currentMapLocation,
+    destination,
+    whatRouteAreYouPassing,
+    whatTimeAreYouGoing,
+    price,
+    paymentMethod
+  }).save();
+
+ return driverBooking
+};
+
+
+
 module.exports = {
   createDriverAccount,
-  findDriverProfile
+  findDriverProfile,
+  saveDriverBooking,
+  findDriverBooking,
 };

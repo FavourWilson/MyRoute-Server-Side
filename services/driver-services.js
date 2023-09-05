@@ -1,5 +1,7 @@
 const handleImageUpload = require("../config/cloudinary-config");
 const driverRepository = require("../repositories/driver-repository");
+const userRepository = require("../repositories/user-repository");
+const helpers = require("../helpers/index");
 
 // setup driver handler
 exports.createDriver = async (
@@ -20,16 +22,23 @@ exports.createDriver = async (
   bankAccountNumber,
   bankName
 ) => {
-
   // upload all driver credentials
-  const uploadDriverLicence =  await handleImageUpload(driverLicense)
-  const uploadOutsideCarPhoto =  await handleImageUpload(outSideCarPhoto)
-  const uploadInsideCarPhoto =  await handleImageUpload(inSideCarPhoto)
+  const uploadDriverLicence = await handleImageUpload(driverLicense);
+  const uploadOutsideCarPhoto = await handleImageUpload(outSideCarPhoto);
+  const uploadInsideCarPhoto = await handleImageUpload(inSideCarPhoto);
 
-  const driverProfile =  await driverRepository.findDriverProfile(userId)
-  if(driverProfile) return "You are already a registered driver"
+  const userInfo = await userRepository.getUserByID(userId);
+  if (!userInfo)
+    return helpers.newError(
+      "User account does not exist, create a new account",
+      404
+    );
 
-  const driver =  await driverRepository.createDriverAccount(
+  const driverProfile = await driverRepository.findDriverProfile(userId);
+  if (driverProfile)
+    return helpers.newError("You are already a registered driver", 409);
+
+  const driver = await driverRepository.createDriverAccount(
     userId,
     referralCode,
     vehicleManufacturer,
@@ -46,7 +55,46 @@ exports.createDriver = async (
     bankAccountHolderName,
     bankAccountNumber,
     bankName
-  )
-  
-  return driver
+  );
+
+  return driver;
+};
+
+exports.driverBooking = async (
+  userId,
+  pickupLocation,
+  dropOffLocation,
+  whenAreyouGoing,
+  seatsAvailable,
+  currentMapLocation,
+  destination,
+  whatRouteAreYouPassing,
+  whatTimeAreYouGoing,
+  price,
+  paymentMethod
+) => {
+
+  const driverProfile = await driverRepository.findDriverProfile(userId);
+  if (!driverProfile)
+    return helpers.newError("You cannot save you booking, setup your driver account", 409);
+
+  const findDriverBooking = await driverRepository.findDriverBooking(userId)
+  if (findDriverBooking)
+    return helpers.newError("You booking has been saved already", 400);
+
+  const createDriverBooking = await driverRepository.saveDriverBooking(
+    userId,
+    pickupLocation,
+    dropOffLocation,
+    whenAreyouGoing,
+    seatsAvailable,
+    currentMapLocation,
+    destination,
+    whatRouteAreYouPassing,
+    whatTimeAreYouGoing,
+    price,
+    paymentMethod
+  );
+
+  return createDriverBooking;
 };

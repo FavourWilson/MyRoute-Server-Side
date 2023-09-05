@@ -27,6 +27,7 @@ const createSendToken = (res, status, user) => {
     res.cookie("SESSIONID", token, cookieOptions);
     res.status(status).json({
       status: "success",
+      statusCode: status,
       token,
       data: {
         user,
@@ -62,9 +63,16 @@ const sendSuccess = (message, code) => {
   return success;
 };
 
+const newError = (message, code) => {
+  const error = new Error(message);
+  error.status = code;
+  throw error;
+}
+
 module.exports = {
   OTP,
   createSendToken,
   sendError,
   sendSuccess,
+  newError
 };
