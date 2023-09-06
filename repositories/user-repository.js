@@ -84,6 +84,7 @@ const updateUserProfile = async (email, body) => {
     : userInfo.profilePic;
   let _password = body.password ? body.password : userInfo.password;
   let _isVerified = body.isVerified ? body.isVerified : userInfo.isVerified;
+  let _canResetPassword = body.canResetPassword ? body.canResetPassword : userInfo.canResetPassword
 
   // if profile picture is updated
   if(body.profilePic){
@@ -99,6 +100,7 @@ const updateUserProfile = async (email, body) => {
         gender: _gender,
         password: _password,
         isVerified: _isVerified,
+        canResetPassword: _canResetPassword
       },
       { new: true }
     );
@@ -118,6 +120,7 @@ const updateUserProfile = async (email, body) => {
       gender: _gender,
       password: _password,
       isVerified: _isVerified,
+      canResetPassword: _canResetPassword
     },
     { new: true }
   );

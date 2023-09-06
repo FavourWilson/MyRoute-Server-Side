@@ -6,7 +6,7 @@ const helpers = require("../helpers");
 exports.createDriver = catchAsync(async (req, res, next) => {
   try {
     const {
-      userId,
+      driverId,
       referralCode,
       vehicleManufacturer,
       vehicleModel,
@@ -25,7 +25,7 @@ exports.createDriver = catchAsync(async (req, res, next) => {
     } = req.body;
 
     await driverServices.createDriver(
-      userId,
+      driverId,
       referralCode,
       vehicleManufacturer,
       vehicleModel,
@@ -54,11 +54,11 @@ exports.createDriver = catchAsync(async (req, res, next) => {
   }
 });
 
-// Create driver
+// setup driver booking
 exports.driverBooking = catchAsync(async (req, res, next) => {
   try {
     const {
-      userId,
+      driverId,
       pickupLocation,
       dropOffLocation,
       whenAreyouGoing,
@@ -72,7 +72,7 @@ exports.driverBooking = catchAsync(async (req, res, next) => {
     } = req.body;
 
     await driverServices.driverBooking(
-      userId,
+      driverId,
       pickupLocation,
       dropOffLocation,
       whenAreyouGoing,

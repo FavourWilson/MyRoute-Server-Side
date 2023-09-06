@@ -15,7 +15,7 @@ const OTP = new Schema({
     type: Date,
     required: true,
     default: Date.now,
-    expires: 1200,
+    expires: 1800,
   },
 });
 
