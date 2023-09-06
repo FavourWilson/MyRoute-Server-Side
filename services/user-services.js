@@ -35,7 +35,7 @@ const loginUser = async (email, password) => {
 // forget password handler
 const forgotPassword = async (email) => {
   const userInfo = await userRepository.getUserByEmail(email);
-  if(!userInfo) return helpers.newError("User doesn't exist", 404)
+  if(!userInfo) return helpers.newError("User not found, Check email again or Register", 404)
 
   // find and delete previous OTP
   await userRepository.findOTP(email);
@@ -46,6 +46,7 @@ const forgotPassword = async (email) => {
   const hash = await bcrypt.hash(resetOTP, Number(bcryptSalt));
 
   await userRepository.createResetOtp(email, hash)
+  await userRepository.updateUserProfile(email, {canResetPassword: true})
 
   return {userInfo, resetOTP};
 };
@@ -53,10 +54,14 @@ const forgotPassword = async (email) => {
 // reset password handler
 const resetPassword = async (email, OTP, password) => {
   const userInfo = await userRepository.getUserByEmail(email);
-  if(!userInfo) return helpers.newError("User doesn't exist", 404)
+  if(!userInfo) return helpers.newError("User not found, Check email again or Register", 404)
 
   let passwordResetOTP = await userRepository.findResetOTP(email);
-  if(passwordResetOTP == null) return helpers.newError("password reset OTP expired", 404)
+
+  if(passwordResetOTP == null){
+    await userRepository.updateUserProfile(email, {canResetPassword: false})
+    return helpers.newError("password reset OTP expired", 404)
+  }
 
   const isValid = await bcrypt.compare(OTP, passwordResetOTP.OTP);
   if (!isValid) return helpers.newError("Invalid or expired reset token", 404);
@@ -64,7 +69,7 @@ const resetPassword = async (email, OTP, password) => {
   // hash the new password
   const hash = await bcrypt.hash(password, Number(bcryptSalt));
 
-  await userRepository.updateUserProfile(email, {password: hash})
+  await userRepository.updateUserProfile(email, {password: hash, canResetPassword: false })
   await userRepository.deleteResetOTP(email);
 };
 
