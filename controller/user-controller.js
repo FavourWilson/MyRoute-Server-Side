@@ -49,7 +49,7 @@ exports.forgetPassword = async (req, res) => {
   }
 };
 
-// Handle user password reset
+// / Handle user password reset
 exports.resetPassword = async (req, res) => {
   try {
     const { email, resetOTP, password } = req.body;
