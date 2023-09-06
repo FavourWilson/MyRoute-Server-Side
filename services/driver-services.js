@@ -5,7 +5,7 @@ const helpers = require("../helpers/index");
 
 // setup driver handler
 exports.createDriver = async (
-  userId,
+  driverId,
   referralCode,
   vehicleManufacturer,
   vehicleModel,
@@ -27,19 +27,19 @@ exports.createDriver = async (
   const uploadOutsideCarPhoto = await handleImageUpload(outSideCarPhoto);
   const uploadInsideCarPhoto = await handleImageUpload(inSideCarPhoto);
 
-  const userInfo = await userRepository.getUserByID(userId);
+  const userInfo = await userRepository.getUserByID(driverId);
   if (!userInfo)
     return helpers.newError(
       "User account does not exist, create a new account",
       404
     );
 
-  const driverProfile = await driverRepository.findDriverProfile(userId);
+  const driverProfile = await driverRepository.findDriverProfile(driverId);
   if (driverProfile)
     return helpers.newError("You are already a registered driver", 409);
 
   const driver = await driverRepository.createDriverAccount(
-    userId,
+    driverId,
     referralCode,
     vehicleManufacturer,
     vehicleModel,
@@ -61,7 +61,7 @@ exports.createDriver = async (
 };
 
 exports.driverBooking = async (
-  userId,
+  driverId,
   pickupLocation,
   dropOffLocation,
   whenAreyouGoing,
@@ -74,16 +74,16 @@ exports.driverBooking = async (
   paymentMethod
 ) => {
 
-  const driverProfile = await driverRepository.findDriverProfile(userId);
+  const driverProfile = await driverRepository.findDriverProfile(driverId);
   if (!driverProfile)
     return helpers.newError("You cannot save you booking, setup your driver account", 409);
 
-  const findDriverBooking = await driverRepository.findDriverBooking(userId)
+  const findDriverBooking = await driverRepository.findDriverBooking(driverId)
   if (findDriverBooking)
     return helpers.newError("You booking has been saved already", 400);
 
   const createDriverBooking = await driverRepository.saveDriverBooking(
-    userId,
+    driverId,
     pickupLocation,
     dropOffLocation,
     whenAreyouGoing,

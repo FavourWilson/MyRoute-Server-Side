@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const DriverBookingSchema = new Schema({
-  userId: {
+  driverId: {
     type: Schema.Types.ObjectId,
     required: true,
     ref: "driver",
