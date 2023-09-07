@@ -137,3 +137,13 @@ exports.userBooking = catchAsync(async (req, res, next) => {
       return res.status(error.status).json(helpers.sendError(error.message, error.status));
   }
 });
+
+exports.deleteUser = async (req, res) => {
+  try {
+    await userServices.deleteUser(req.params.email);
+    return res.status(200).json(helpers.sendSuccess("user successfully deleted", 200));
+  } catch (error) {
+    if(error.status)
+      return res.status(error.status).json(helpers.sendError(error.message, error.status)) 
+  }
+}
