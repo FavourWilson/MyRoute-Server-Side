@@ -24,11 +24,12 @@ const createUser = async (firstName, lastName, email, phone, gender, password, n
 // login user handler
 const loginUser = async (email, password) => {
   const userInfo = await userRepository.doesUserExist(email);
-  if(!userInfo) return helpers.newError("User doesn't exist", 404)  
-
+  if(!userInfo) return helpers.newError("User doesn't exist", 404)
+  
   const isPasswordCorrect = await bcrypt.compare( password, userInfo.password);
   if (!isPasswordCorrect) return helpers.newError("Invalid credentials", 400)
-
+  if(user.isVerified == false) return helpers.newError("Verify your email", 401)
+  
   return userInfo
 };
 
@@ -99,6 +100,38 @@ const resendOtp = async (email) => {
   return {OTP, user}
 };
 
+const userBooking = async (
+  userId,
+  whereAreyouLeavingFrom,
+  whereAreyouGoing,
+  whenAreyouGoing,
+  seatsAvailable,
+  currentMapLocation,
+  preferredRoute,
+  whatTimeAreYouGoing
+) => {
+
+  const userProfile = await userRepository.getUserByID(userId);
+  if (!userProfile)
+    return helpers.newError("You cannot save you booking, setup your driver account", 409);
+
+  const findUserBooking = await userRepository.findUserBooking(userId)
+  if (findUserBooking)
+    return helpers.newError("You have created a booking already", 400);
+
+  const createDriverBooking = await userRepository.saveUserBooking(
+    userId,
+    whereAreyouLeavingFrom,
+    whereAreyouGoing,
+    whenAreyouGoing,
+    seatsAvailable,
+    currentMapLocation,
+    preferredRoute,
+    whatTimeAreYouGoing
+  );
+
+  return createDriverBooking;
+};
 
 // update account handler
 const updateAccount = async(email, body) => {
@@ -118,5 +151,6 @@ module.exports = {
   resetPassword,
   verifyUser,
   resendOtp,
-  updateAccount
+  updateAccount,
+  userBooking
 };

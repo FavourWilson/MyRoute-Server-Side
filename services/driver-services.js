@@ -34,7 +34,7 @@ exports.createDriver = async (
       404
     );
 
-  const driverProfile = await driverRepository.findDriverProfile(driverId);
+  const driverProfile = await driverRepository.findDriverByID(driverId);
   if (driverProfile)
     return helpers.newError("You are already a registered driver", 409);
 

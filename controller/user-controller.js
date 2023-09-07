@@ -9,9 +9,7 @@ exports.login = catchAsync(async (req, res, next) => {
     const { email, password } = req.body;
 
     const user = await userServices.loginUser(email, password);
-    if(user.isVerified == false) return res.status(401).json(helpers.sendError("Verify your email", 401))
-      return res.status(200).json(helpers.createSendToken(res, 200, user));
-
+    return res.status(200).json(helpers.createSendToken(res, 200, user));
   } catch (error) {
     if(error.status)
       return res.status(error.status).json(helpers.sendError(error.message, error.status)) 
@@ -55,8 +53,8 @@ exports.resetPassword = async (req, res) => {
     const { email, resetOTP, password } = req.body;
 
     const user = await userServices.resetPassword(email, resetOTP, password);
-
     mailer.resetPasswordMail(user.email, "Password Reset Successfully", { name: user.firstName });
+
     res.status(200).json({ message: "Password reset was successful" });
   } catch (error) {
     if(error.status)
@@ -66,9 +64,9 @@ exports.resetPassword = async (req, res) => {
 
 // Handle verify user
 exports.verifyOTP = async (req, res) => {
-  const { email, OTP } = req.body;
-
   try {
+    const { email, OTP } = req.body;
+
     await userServices.verifyUser(email, OTP);
     return res.status(200).json(helpers.sendSuccess("OTP successfully verified", 200));
   } catch (error) {
@@ -107,3 +105,35 @@ exports.updateAccount = async (req, res) => {
      return res.status(error.status).json(helpers.sendError(error.message, error.status));
   }
 };
+
+// setup driver booking
+exports.userBooking = catchAsync(async (req, res, next) => {
+  try {
+    const {
+      userId,
+      whereAreyouLeavingFrom,
+      whereAreyouGoing,
+      whenAreyouGoing,
+      seatsAvailable,
+      currentMapLocation,
+      preferredRoute,
+      whatTimeAreYouGoing
+    } = req.body;
+
+    await userServices.driverBooking(
+      userId,
+      whereAreyouLeavingFrom,
+      whereAreyouGoing,
+      whenAreyouGoing,
+      seatsAvailable,
+      currentMapLocation,
+      preferredRoute,
+      whatTimeAreYouGoing
+    );
+
+    return res.status(201).json(helpers.sendSuccess("driver booking successful saved", 201));
+  } catch (error) {
+    if (error.status)
+      return res.status(error.status).json(helpers.sendError(error.message, error.status));
+  }
+});

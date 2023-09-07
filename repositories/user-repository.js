@@ -1,6 +1,8 @@
 const User = require("../models/user-model");
 const OTP = require("../models/OTP-model");
 const ResetOTP = require("../models/reset-OTP-model");
+const UserBooking = require("../models/user-booking-model")
+
 const handleImageUpload = require("../config/cloudinary-config");
 
 // check if user exist
@@ -15,22 +17,22 @@ const getUserByEmail = async (email) => {
   return getUserByEmail;
 };
 
+// get user by ID
 const getUserByID = async (_id) => {
   const getUserByID = await User.findById(_id);
   return getUserByID; 
 }
 
-const deleteOTP = async (email) => {
-  await OTP.findOneAndDelete({ email });
-};
+// delete user OTP
+const deleteOTP = async (email) =>  await OTP.findOneAndDelete({ email });
 
-// find OTP handler
+// find user OTP
 const findOTP = async (email) => {
   const OTPCode = await OTP.findOne({ email });
   return OTPCode;
 };
 
-// create new user handler
+// create new user
 const createNewUser = async (
   firstName,
   lastName,
@@ -53,7 +55,7 @@ const createNewUser = async (
   return newUser;
 };
 
-// Register OTP handler
+// create new OTP
 const createRegisterOtp = async (email, code) => {
   const _OTP = await findOTP(email);
   if (_OTP) deleteOTP(email);
@@ -67,7 +69,7 @@ const createRegisterOtp = async (email, code) => {
   return code;
 };
 
-// update profile handler
+// update user profile
 const updateUserProfile = async (email, body) => {
   const userInfo = await User.findOne({ email });
 
@@ -133,10 +135,10 @@ const findResetOTP = async (email) => {
   return passwordResetOTP;
 };
 
-const deleteResetOTP = async (email) => {
-  await ResetOTP.findOneAndDelete({ email });
-};
+// delete OTP
+const deleteResetOTP = async (email) =>  await ResetOTP.findOneAndDelete({ email });
 
+// create reset OTP
 const createResetOtp = async (email, hash) => {
   deleteResetOTP(email);
 
@@ -146,6 +148,38 @@ const createResetOtp = async (email, hash) => {
     createdAt: Date.now(),
   }).save();
 };
+
+const findUserBooking = async(userID) => {
+  const userBookingProfile  = await UserBooking.findById(userID)
+  return userBookingProfile
+}
+
+// save user booking
+const saveUserBooking = async (
+  userId,
+  whereAreyouLeavingFrom,
+  whereAreyouGoing,
+  whenAreyouGoing,
+  seatsAvailable,
+  currentMapLocation,
+  preferredRoute,
+  whatTimeAreYouGoing
+) => {
+
+  const userBooking = await new UserBooking({
+    userId,
+    whereAreyouLeavingFrom,
+    whereAreyouGoing,
+    whenAreyouGoing,
+    seatsAvailable,
+    currentMapLocation,
+    preferredRoute,
+    whatTimeAreYouGoing
+  }).save();
+
+ return userBooking
+};
+
 
 module.exports = {
   getUserByEmail,
@@ -158,5 +192,7 @@ module.exports = {
   findResetOTP,
   findOTP,
   deleteOTP,
-  getUserByID
+  getUserByID,
+  findUserBooking,
+  saveUserBooking
 };

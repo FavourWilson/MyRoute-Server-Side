@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const helpers = require("../helpers")
 
 exports.sendMail = async (email, subject, payload) => {
 
@@ -26,9 +27,7 @@ exports.sendMail = async (email, subject, payload) => {
     // Send email
     transporter.sendMail(options(), (error, info) => {
       if (error) {
-        console.log({
-          success: false, error
-        });
+        helpers.newError("email was not successfully sent, check you network connection", 400)
       } else {
         console.log({
           success: true,
@@ -36,6 +35,7 @@ exports.sendMail = async (email, subject, payload) => {
       }
     });
   } catch (error) {
-    console.log({ errorMessage: "Could not sent email"});
+    helpers.newError("Could not sent email", 400)
+    // console.log({ errorMessage: });
   }
 };
