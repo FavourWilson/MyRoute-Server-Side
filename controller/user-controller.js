@@ -53,9 +53,9 @@ exports.resetPassword = async (req, res) => {
     const { email, resetOTP, password } = req.body;
 
     const user = await userServices.resetPassword(email, resetOTP, password);
+    
     mailer.resetPasswordMail(user.email, "Password Reset Successfully", { name: user.firstName });
-
-    res.status(200).json({ message: "Password reset was successful" });
+    res.status(200).json(helpers.sendSuccess("Password reset was successful", 200));
   } catch (error) {
     if(error.status)
       return res.status(error.status).json(helpers.sendError(error.message, error.status))
@@ -137,3 +137,13 @@ exports.userBooking = catchAsync(async (req, res, next) => {
       return res.status(error.status).json(helpers.sendError(error.message, error.status));
   }
 });
+
+exports.deleteUser = async (req, res) => {
+  try {
+    await userServices.deleteUser(req.params.email);
+    return res.status(200).json(helpers.sendSuccess("user successfully deleted", 200));
+  } catch (error) {
+    if(error.status)
+      return res.status(error.status).json(helpers.sendError(error.message, error.status)) 
+  }
+}

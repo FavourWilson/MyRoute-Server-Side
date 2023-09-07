@@ -23,6 +23,9 @@ const getUserByID = async (_id) => {
   return getUserByID; 
 }
 
+// delete user
+const deleteUserAccount = async(email) => await User.findOneAndDelete({ email })
+
 // delete user OTP
 const deleteOTP = async (email) =>  await OTP.findOneAndDelete({ email });
 
@@ -116,7 +119,7 @@ const updateUserProfile = async (email, body) => {
       email: _email,
       firstName: _firstName,
       lastName: _lastName,
-      profilePic: _profilePic.secure_url,
+      profilePic: _profilePic,
       ninDocument: _ninDocument,
       phone: _phone,
       gender: _gender,
@@ -149,6 +152,7 @@ const createResetOtp = async (email, hash) => {
   }).save();
 };
 
+// find user booking
 const findUserBooking = async(userID) => {
   const userBookingProfile  = await UserBooking.findById(userID)
   return userBookingProfile
@@ -180,7 +184,6 @@ const saveUserBooking = async (
  return userBooking
 };
 
-
 module.exports = {
   getUserByEmail,
   createNewUser,
@@ -194,5 +197,6 @@ module.exports = {
   deleteOTP,
   getUserByID,
   findUserBooking,
-  saveUserBooking
+  saveUserBooking,
+  deleteUserAccount
 };

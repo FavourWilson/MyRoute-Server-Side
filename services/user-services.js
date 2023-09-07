@@ -15,6 +15,8 @@ const createUser = async (firstName, lastName, email, phone, gender, password, n
 
   // upload nin to cloudinary and create account
   const nin = await handleImageUpload(ninDocument)
+  if(!nin.secure_url) return helpers.newError("Could not upload nin", 500)
+
   const newUser = await userRepository.createNewUser(firstName, lastName, email, phone, gender, password, nin.secure_url);
   const registeredOTP = await userRepository.createRegisterOtp(email, OTPCode);
 
@@ -31,6 +33,14 @@ const loginUser = async (email, password) => {
   if(user.isVerified == false) return helpers.newError("Verify your email", 401)
   
   return userInfo
+};
+
+// delete user
+const deleteUser = async (email) => {
+  const userInfo = await userRepository.doesUserExist(email);
+  if(!userInfo) return helpers.newError("User doesn't exist", 404)
+  
+  await userRepository.deleteUserAccount(email)
 };
 
 // forget password handler
@@ -86,6 +96,7 @@ const verifyUser = async (email, OTP) => {
   if (OTP !== OTPCode.OTP) return helpers.newError("OTP was not successfully verified") 
 
   await userRepository.updateUserProfile(email, {isVerified: true});
+  console.log("data")
   await userRepository.deleteOTP(email)
 }
 
@@ -152,5 +163,6 @@ module.exports = {
   verifyUser,
   resendOtp,
   updateAccount,
-  userBooking
+  userBooking,
+  deleteUser
 };
