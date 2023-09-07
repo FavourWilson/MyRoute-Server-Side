@@ -181,7 +181,6 @@ const saveUserBooking = async (
  return userBooking
 };
 
-
 module.exports = {
   getUserByEmail,
   createNewUser,
