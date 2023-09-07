@@ -1,17 +1,19 @@
 const Driver = require("../models/driver-model");
 const DriverBooking = require("../models/driver-booking-model");
 
-
-const findDriverProfile = async(driverId) => {
+// find driver profile
+const findDriverByID = async(driverId) => {
   const driverProfile  = await Driver.findById(driverId)
   return driverProfile
 }
 
+// find driver booking
 const findDriverBooking = async(driverId) => {
   const driverBookingProfile  = await DriverBooking.findById(driverId)
   return driverBookingProfile
 }
 
+// create driver account
 const createDriverAccount = async (
   driverId,
   referralCode,
@@ -53,6 +55,7 @@ const createDriverAccount = async (
  return driver
 };
 
+// save driver booking
 const saveDriverBooking = async (
   driverId,
   pickupLocation,
@@ -86,7 +89,7 @@ const saveDriverBooking = async (
 
 module.exports = {
   createDriverAccount,
-  findDriverProfile,
+  findDriverByID,
   saveDriverBooking,
   findDriverBooking,
 };
