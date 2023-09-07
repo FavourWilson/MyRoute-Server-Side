@@ -149,6 +149,7 @@ const createResetOtp = async (email, hash) => {
   }).save();
 };
 
+// find user booking
 const findUserBooking = async(userID) => {
   const userBookingProfile  = await UserBooking.findById(userID)
   return userBookingProfile
