@@ -26,12 +26,13 @@ const createUser = async (firstName, lastName, email, phone, gender, password, n
 // login user handler
 const loginUser = async (email, password) => {
   const userInfo = await userRepository.doesUserExist(email);
-  if(!userInfo) return helpers.newError("User doesn't exist", 404)
-  
+ 
+  if(!userInfo) return helpers.newError("User doesn't exist", 404) 
   const isPasswordCorrect = await bcrypt.compare( password, userInfo.password);
+
   if (!isPasswordCorrect) return helpers.newError("Invalid credentials", 400)
-  if(user.isVerified == false) return helpers.newError("Verify your email", 401)
-  
+  if(userInfo.isVerified == false) return helpers.newError("Verify your email", 401)
+    
   return userInfo
 };
 
