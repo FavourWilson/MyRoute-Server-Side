@@ -71,7 +71,7 @@ exports.driverBooking = catchAsync(async (req, res, next) => {
       paymentMethod,
     } = req.body;
 
-    await driverServices.driverBooking(
+    await driverServices.saveDriverBooking(
       driverId,
       pickupLocation,
       dropOffLocation,
@@ -85,13 +85,9 @@ exports.driverBooking = catchAsync(async (req, res, next) => {
       paymentMethod
     );
 
-    return res
-      .status(201)
-      .json(helpers.sendSuccess("driver booking successful saved", 201));
+    return res.status(201).json(helpers.sendSuccess("driver booking successful saved", 201));
   } catch (error) {
     if (error.status)
-      return res
-        .status(error.status)
-        .json(helpers.sendError(error.message, error.status));
+      return res.status(error.status).json(helpers.sendError(error.message, error.status));
   }
 });

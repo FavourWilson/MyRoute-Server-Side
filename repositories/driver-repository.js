@@ -1,17 +1,16 @@
 const Driver = require("../models/driver-model");
-const DriverBooking = require("../models/driver-booking-model");
 
 // find driver profile
-const findDriverByID = async(driverId) => {
-  const driverProfile  = await Driver.findById(driverId)
-  return driverProfile
-}
+const findDriverByID = async (driverId) => {
+  const driverProfile = await Driver.findOne({ driverId });
+  return driverProfile;
+};
 
 // find driver booking
-const findDriverBooking = async(driverId) => {
-  const driverBookingProfile  = await DriverBooking.findById(driverId)
-  return driverBookingProfile
-}
+// const findDriverBooking = async(driverId) => {
+//   const driverBookingProfile  = await DriverBooking.findOne({ driverId })
+//   return driverBookingProfile
+// }
 
 // create driver account
 const createDriverAccount = async (
@@ -32,7 +31,6 @@ const createDriverAccount = async (
   bankAccountNumber,
   bankName
 ) => {
-
   const driver = await new Driver({
     driverId,
     referralCode,
@@ -52,7 +50,7 @@ const createDriverAccount = async (
     bankName,
   }).save();
 
- return driver
+  return driver;
 };
 
 // save driver booking
@@ -70,26 +68,25 @@ const saveDriverBooking = async (
   paymentMethod
 ) => {
 
-  const driverBooking = await new DriverBooking({
-    driverId,
-    pickupLocation,
-    dropOffLocation,
-    whenAreyouGoing,
-    seatsAvailable,
-    currentMapLocation,
-    destination,
-    whatRouteAreYouPassing,
-    whatTimeAreYouGoing,
-    price,
-    paymentMethod
-  }).save();
-
- return driverBooking
+  const driverBooking = await Driver.findOneAndUpdate({ driverId }, { 
+    savedBooking : {
+      pickupLocation,
+      dropOffLocation,
+      whenAreyouGoing,
+      seatsAvailable,
+      currentMapLocation,
+      destination,
+      whatRouteAreYouPassing,
+      whatTimeAreYouGoing,
+      price,
+      paymentMethod,
+    }  
+  }, {new: true})  
+  return driverBooking;
 };
 
 module.exports = {
   createDriverAccount,
   findDriverByID,
   saveDriverBooking,
-  findDriverBooking,
 };
