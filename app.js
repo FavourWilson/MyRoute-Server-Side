@@ -10,7 +10,6 @@ const carRouter = require("./route/carRoute");
 const cardRouter = require("./route/cardRoute")
 const bankRouter = require("./route/bankRoute")
 
-
 // import the error handling middleware
 const { generalErrorHandler } = require("./utils/generalErrorHandler");
 
@@ -21,8 +20,6 @@ const app = express();
 app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({limit: '50mb', extended: true}));
 
-
-
 // Accessing the cookies sent with the request
 app.use(cookieParser());
 
@@ -31,19 +28,6 @@ app.use(cors());
 
 // Enable logging middleware (using dev format)
 app.use(morgan("dev"));
-
-// router middleware
-/**
- * 
- *  @swagger 
- * /api/v1/users:
- *   post:
- *     summary: This api is used to signup
- *     description: This api shows you how to use the signup route
- *       responses:
- *           201:
- *           description: To test post method
- */
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/drivers", driverRouter);
 app.use("/api/v1/banks", bankRouter);
