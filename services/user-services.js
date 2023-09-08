@@ -32,7 +32,7 @@ const loginUser = async (email, password) => {
 
   if (!isPasswordCorrect) return helpers.newError("Invalid credentials", 400)
   if(userInfo.isVerified == false) return helpers.newError("Verify your email", 401)
-    
+
   return userInfo
 };
 
@@ -147,12 +147,7 @@ const userBooking = async (
 
 // update account handler
 const updateAccount = async(email, body) => {
-  const isProfileUpdated =  await userRepository.updateUserProfile(email, body)
-
-  if(!isProfileUpdated)
-    return helpers.newError("could not update user profile", 500)
-
-  
+  const isProfileUpdated =  await userRepository.updateUserProfile(email, body)  
   return isProfileUpdated  
 }
 

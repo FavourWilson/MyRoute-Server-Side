@@ -2,6 +2,7 @@ const User = require("../models/user-model");
 const OTP = require("../models/OTP-model");
 const ResetOTP = require("../models/reset-OTP-model");
 const UserBooking = require("../models/user-booking-model")
+const helpers = require("../helpers/index")
 const handleImageUpload = require("../config/cloudinary-config");
 
 // USER
@@ -51,41 +52,46 @@ const createNewUser = async (
 
 // update user profile
 const updateUserProfile = async (email, body) => {
-  const userInfo = await User.findOne({ email });
-
-  let _email = body.email ? body.email : userInfo.email;
-  let _firstName = body.firstName ? body.firstName : userInfo.firstName;
-  let _lastName = body.lastName ? body.lastName : userInfo.lastName;
-  let _ninDocument = body.ninDocument 
-    ? await handleImageUpload(body.ninDocument) 
-    : userInfo.ninDocument;
-  let _phone = body.phone ? body.phone : userInfo.phone;
-  let _gender = body.gender ? body.gender : userInfo.gender;
-  let _profilePic = body.profilePic
-    ? await handleImageUpload(body.profilePic)
-    : userInfo.profilePic;
-  let _password = body.password ? body.password : userInfo.password;
-  let _isVerified = body.isVerified ? body.isVerified : userInfo.isVerified;
-  let _canResetPassword = body.canResetPassword ? body.canResetPassword : userInfo.canResetPassword
-
-  // if profile picture is updated
-  const updateProfile =  await User.findOneAndUpdate(
-    { email },
-    {
-      email: _email,
-      firstName: _firstName,
-      lastName: _lastName,
-      profilePic: (body.profilePic ? _profilePic.secure_url : _profilePic),
-      ninDocument: _ninDocument,
-      phone: _phone,
-      gender: _gender,
-      password: _password,
-      isVerified: _isVerified,
-      canResetPassword: _canResetPassword
-    },
-    { new: true }
-  );
-  return updateProfile
+  try{
+    const userInfo = await User.findOne({ email });
+  
+    let _email = body.email ? body.email : userInfo.email;
+    let _firstName = body.firstName ? body.firstName : userInfo.firstName;
+    let _lastName = body.lastName ? body.lastName : userInfo.lastName;
+    let _ninDocument = body.ninDocument 
+      ? await handleImageUpload(body.ninDocument) 
+      : userInfo.ninDocument;
+    let _phone = body.phone ? body.phone : userInfo.phone;
+    let _gender = body.gender ? body.gender : userInfo.gender;
+    let _profilePic = body.profilePic
+      ? await handleImageUpload(body.profilePic)
+      : userInfo.profilePic;
+    let _password = body.password ? body.password : userInfo.password;
+    let _isVerified = body.isVerified ? body.isVerified : userInfo.isVerified;
+    let _canResetPassword = body.canResetPassword ? body.canResetPassword : userInfo.canResetPassword
+  
+  
+    // if profile picture is updated
+    const updateProfile =  await User.findOneAndUpdate(
+      { email },
+      {
+        email: _email,
+        firstName: _firstName,
+        lastName: _lastName,
+        profilePic: (body.profilePic ? _profilePic.secure_url : _profilePic),
+        ninDocument: _ninDocument,
+        phone: _phone,
+        gender: _gender,
+        password: _password,
+        isVerified: _isVerified,
+        canResetPassword: _canResetPassword
+      },
+      { new: true }
+    );
+    return updateProfile
+  }catch(error){
+    helpers.newError(error.message, error.http_code)
+  }
 };
 
 // OTP
