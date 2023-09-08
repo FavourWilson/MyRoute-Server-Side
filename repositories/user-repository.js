@@ -1,7 +1,7 @@
 const User = require("../models/user-model");
 const OTP = require("../models/OTP-model");
 const ResetOTP = require("../models/reset-OTP-model");
-const UserBooking = require("../models/user-booking-model")
+const BookDriver = require("../models/book-driver-model")
 const helpers = require("../helpers/index")
 const handleImageUpload = require("../config/cloudinary-config");
 
@@ -140,13 +140,13 @@ const findOTP = async (email) => {
 
 // BOOKING
 // find user booking
-const findUserBooking = async(userID) => {
-  const userBookingProfile  = await UserBooking.findById(userID)
+const initBooking = async(userID) => {
+  const userBookingProfile  = await BookDriver.findById(userID)
   return userBookingProfile
 }
 
 // save user booking
-const saveUserBooking = async (
+const saveBooking = async (
   userId,
   whereAreyouLeavingFrom,
   whereAreyouGoing,
@@ -171,6 +171,7 @@ const saveUserBooking = async (
  return userBooking
 };
 
+
 module.exports = {
   getUserByEmail,
   createNewUser,
@@ -183,7 +184,7 @@ module.exports = {
   findOTP,
   deleteOTP,
   getUserByID,
-  findUserBooking,
-  saveUserBooking,
+  initBooking,
+  saveBooking,
   deleteUserAccount
 };

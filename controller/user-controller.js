@@ -120,7 +120,7 @@ exports.userBooking = catchAsync(async (req, res, next) => {
       whatTimeAreYouGoing
     } = req.body;
 
-    await userServices.driverBooking(
+    await userServices.userBooking(
       userId,
       whereAreyouLeavingFrom,
       whereAreyouGoing,
@@ -131,12 +131,22 @@ exports.userBooking = catchAsync(async (req, res, next) => {
       whatTimeAreYouGoing
     );
 
-    return res.status(201).json(helpers.sendSuccess("driver booking successful saved", 201));
+    return res.status(201).json(helpers.sendSuccess("user booking successful saved", 201));
   } catch (error) {
     if (error.status)
       return res.status(error.status).json(helpers.sendError(error.message, error.status));
   }
 });
+
+exports.searchRide = async (req, res) => {
+  try{
+    const { currentMapLocation } = req.query
+    // await userServices.createUser()
+  }catch(error){
+    if(error.status)
+      return res.status(error.status).json(helpers.sendError(error.message, error.status)) 
+  }
+}
 
 exports.deleteUser = async (req, res) => {
   try {

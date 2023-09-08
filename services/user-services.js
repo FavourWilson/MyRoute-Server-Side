@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const userRepository = require("../repositories/user-repository");
+const driverRepository = require("../repositories/driver-repository");
 const handleImageUpload = require("../config/cloudinary-config");
 const helpers = require("../helpers");
 
@@ -111,6 +112,12 @@ const resendOtp = async (email) => {
   
   return {OTP, user}
 };
+
+const searchRide = async (currentMapLocation) => {
+  const ride =  await driverRepository.searchForDriver(currentMapLocation)
+
+  console.log(ride)
+}
 
 const userBooking = async (
   userId,

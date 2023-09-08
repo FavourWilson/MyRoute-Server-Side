@@ -9,30 +9,37 @@ const DriverSchema = new Schema({
   },
   referralCode: {
     type: String,
+    default: null
   },
   vehicleManufacturer: {
     type: String,
     required: [true, "provide the manufacturer of the vehicle"],
+    default: null
   },
   vehicleModel: {
     type: String,
     required: [true, "Vehicle model cannot be empty"],
+    default: null
   },
   vehicleYear: {
     type: String,
     required: [true, "Vehicle year cannot be empty"],
+    default: null
   },
   vehicleColor: {
     type: String,
     required: [true, "Vehicle color cannot be empty"],
+    default: null
   },
   plateNumberLicense: {
     type: String,
     required: [true, "License plate number cannot be empty"],
+    default: null
   },
   driverLicenseNumber: {
     type: String,
     required: [true, "driver license field cannot be empty"],
+    default: null
   },
   driverLicense: {
     type: String,
@@ -74,6 +81,50 @@ const DriverSchema = new Schema({
     required: [true, "Bank name cannot be empty"],
     default: null,
   },
+  savedBooking: {
+    pickupLocation: {
+      type: String,
+      default: null
+    },
+    dropOffLocation: {
+      type: String,
+      default: null
+    },
+    whenAreyouGoing: {
+      type: String,
+      default: null
+    },
+    seatsAvailable: {
+      type: Number,
+      default: null
+    },
+    currentMapLocation: {
+      type: String,
+      default: null
+    },
+    destination: {
+      type: String,
+      default: null
+    },
+    whatRouteAreYouPassing: {
+      type: String,
+      default: null,
+    },
+    whatTimeAreYouGoing: {
+      type: String,
+      default: null,
+    },
+    price: {
+      type: String,
+      default: null,
+    },
+    paymentMethod: [
+      {
+        type: String,
+        default: null,
+      } 
+    ]
+  }
 });
 
 const Driver = mongoose.model("driver", DriverSchema);

@@ -11,7 +11,6 @@ const sendVerificationCode = (email, subject, userPayload) => {
 
 // export the request password reset function for email sending
 const forgetPasswordMail = (email, subject, userPayload) => {
-  console.log(userPayload.link);
   const payload = `<p>Hello ${userPayload.name} </p>
    <p>You requested to reset your password.</p>
    <p>Please, click the link below to reset your password</p>

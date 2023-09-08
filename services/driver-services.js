@@ -60,7 +60,7 @@ exports.createDriver = async (
   return driver;
 };
 
-exports.driverBooking = async (
+exports.saveDriverBooking = async (
   driverId,
   pickupLocation,
   dropOffLocation,
@@ -74,13 +74,13 @@ exports.driverBooking = async (
   paymentMethod
 ) => {
 
-  const driverProfile = await driverRepository.findDriverProfile(driverId);
+  const userInfo =  await userRepository.getUserByID(driverId)
+  if(!userInfo)
+    return helpers.newError("User does not exist", 404)
+
+  const driverProfile = await driverRepository.findDriverByID(driverId);
   if (!driverProfile)
     return helpers.newError("You cannot save you booking, setup your driver account", 409);
-
-  const findDriverBooking = await driverRepository.findDriverBooking(driverId)
-  if (findDriverBooking)
-    return helpers.newError("You booking has been saved already", 400);
 
   const createDriverBooking = await driverRepository.saveDriverBooking(
     driverId,
@@ -95,6 +95,6 @@ exports.driverBooking = async (
     price,
     paymentMethod
   );
-
-  return createDriverBooking;
+  
+  return createDriverBooking; 
 };

@@ -1,19 +1,19 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const DriverBookingSchema = new Schema({
-  driverId: {
+const BookDriverSchema = new Schema({
+  userId: {
     type: Schema.Types.ObjectId,
     required: true,
     ref: "driver",
   },
-  pickupLocation: {
+  whereAreyouLeavingFrom: {
     type: String,
-    required: [true, "Provide a pick up location"],
+    required: [true, "Where are you going to"],
   },
-  dropOffLocation: {
+  whereAreyouGoing: {
     type: String,
-    required: [true, "Provide a drop off location"],
+    required: [true, "Where are you going to"],
   },
   whenAreyouGoing: {
     type: String,
@@ -27,11 +27,7 @@ const DriverBookingSchema = new Schema({
     type: String,
     required: [true, "Provide a current map location"],
   },
-  destination: {
-    type: String,
-    required: [true, "Provide a destination"],
-  },
-  whatRouteAreYouPassing: {
+  preferredRoute: {
     type: String,
     required: [true, "Provide a route you are passing"],
     default: null,
@@ -40,21 +36,9 @@ const DriverBookingSchema = new Schema({
     type: String,
     required: [true, "Provide the time your are going"],
     default: null,
-  },
-  price: {
-    type: String,
-    required: [true, "Provide your price"],
-    default: null,
-  },
-  paymentMethod: [
-    {
-      type: String,
-      required: [true, "Provide a payment method"],
-      default: null,
-    } 
-  ]
+  }
 });
 
-const DriverBooking = mongoose.model("driver-booking", DriverBookingSchema);
+const BookDriver = mongoose.model("user-booking", BookDriverSchema);
 
-module.exports = DriverBooking;
+module.exports = BookDriver;
