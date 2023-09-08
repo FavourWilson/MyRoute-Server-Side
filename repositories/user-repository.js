@@ -2,9 +2,9 @@ const User = require("../models/user-model");
 const OTP = require("../models/OTP-model");
 const ResetOTP = require("../models/reset-OTP-model");
 const UserBooking = require("../models/user-booking-model")
-
 const handleImageUpload = require("../config/cloudinary-config");
 
+// USER
 // check if user exist
 const doesUserExist = async (email) => {
   const oldUser = await User.findOne({ email });
@@ -25,15 +25,6 @@ const getUserByID = async (_id) => {
 
 // delete user
 const deleteUserAccount = async(email) => await User.findOneAndDelete({ email })
-
-// delete user OTP
-const deleteOTP = async (email) =>  await OTP.findOneAndDelete({ email });
-
-// find user OTP
-const findOTP = async (email) => {
-  const OTPCode = await OTP.findOne({ email });
-  return OTPCode;
-};
 
 // create new user
 const createNewUser = async (
@@ -58,20 +49,6 @@ const createNewUser = async (
   return newUser;
 };
 
-// create new OTP
-const createRegisterOtp = async (email, code) => {
-  const _OTP = await findOTP(email);
-  if (_OTP) deleteOTP(email);
-
-  await new OTP({
-    email: email,
-    OTP: code,
-    createdAt: Date.now(),
-  }).save();
-
-  return code;
-};
-
 // update user profile
 const updateUserProfile = async (email, body) => {
   const userInfo = await User.findOne({ email });
@@ -92,34 +69,13 @@ const updateUserProfile = async (email, body) => {
   let _canResetPassword = body.canResetPassword ? body.canResetPassword : userInfo.canResetPassword
 
   // if profile picture is updated
-  if(body.profilePic){
-    const updateProfile =  await User.findOneAndUpdate(
-      { email },
-      {
-        email: _email,
-        firstName: _firstName,
-        lastName: _lastName,
-        profilePic: _profilePic.secure_url,
-        ninDocument: _ninDocument,
-        phone: _phone,
-        gender: _gender,
-        password: _password,
-        isVerified: _isVerified,
-        canResetPassword: _canResetPassword
-      },
-      { new: true }
-    );
-    return updateProfile
-  }
-
-  // if images are not updated
-  const _updateProfile =  await User.findOneAndUpdate(
+  const updateProfile =  await User.findOneAndUpdate(
     { email },
     {
       email: _email,
       firstName: _firstName,
       lastName: _lastName,
-      profilePic: _profilePic,
+      profilePic: (body.profilePic ? _profilePic.secure_url : _profilePic),
       ninDocument: _ninDocument,
       phone: _phone,
       gender: _gender,
@@ -129,9 +85,10 @@ const updateUserProfile = async (email, body) => {
     },
     { new: true }
   );
-  return _updateProfile  
+  return updateProfile
 };
 
+// OTP
 // Reset OTP handlers
 const findResetOTP = async (email) => {
   let passwordResetOTP = await ResetOTP.findOne({ email });
@@ -152,6 +109,30 @@ const createResetOtp = async (email, hash) => {
   }).save();
 };
 
+// create new OTP
+const createRegisterOtp = async (email, code) => {
+  const _OTP = await findOTP(email);
+  if (_OTP) deleteOTP(email);
+
+  await new OTP({
+    email: email,
+    OTP: code,
+    createdAt: Date.now(),
+  }).save();
+
+  return code;
+};
+
+// delete user OTP
+const deleteOTP = async (email) =>  await OTP.findOneAndDelete({ email });
+
+// find user OTP
+const findOTP = async (email) => {
+  const OTPCode = await OTP.findOne({ email });
+  return OTPCode;
+};
+
+// BOOKING
 // find user booking
 const findUserBooking = async(userID) => {
   const userBookingProfile  = await UserBooking.findById(userID)
