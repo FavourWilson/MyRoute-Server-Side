@@ -118,12 +118,14 @@ const DriverSchema = new Schema({
       type: String,
       default: null,
     },
-    paymentMethod: [
-      {
-        type: String,
-        default: null,
-      } 
-    ]
+    paymentMethod: [{
+      type: String,
+      default: null,
+    }],
+    passengers: [{
+      type: String,
+      default: null
+    }]
   }
 });
 

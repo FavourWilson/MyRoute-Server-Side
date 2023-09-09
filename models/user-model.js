@@ -41,6 +41,40 @@ const UserSchema = new mongoose.Schema({
   },
   isVerified: {type: Boolean, default: false},
   canResetPassword: { type: Boolean, default: false},
+  paymentMethod: [{
+    type: String,
+    default: null,
+  }],
+  savedBooking: {
+    whereAreyouLeavingFrom: {
+      type: String,
+      default: null
+    },
+    whereAreyouGoing: {
+      type: String,
+      default: null
+    },
+    whenAreyouGoing: {
+      type: String,
+      default: null
+    },
+    seatsAvailable: {
+      type: Number,
+      default: null
+    },
+    currentMapLocation: {
+      type: String,
+      default: null
+    },
+    preferredRoute: {
+      type: String,
+      default: null
+    },
+    whatTimeAreYouGoing: {
+      type: String,
+      default: null,
+    }
+  }
 });
 
 UserSchema.pre("save", async function (next) {

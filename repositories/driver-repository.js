@@ -1,10 +1,19 @@
 const Driver = require("../models/driver-model");
 
+
 // find driver profile
 const findDriverByID = async (driverId) => {
   const driverProfile = await Driver.findOne({ driverId });
   return driverProfile;
 };
+
+const searchForDrivers = async (
+  whereAreyouGoing,
+  currentMapLocation
+) => {
+  const driverSearchResult = await Driver.find({ currentMapLocation, whereAreyouGoing })
+  return driverSearchResult
+}
 
 // find driver booking
 // const findDriverBooking = async(driverId) => {
@@ -85,8 +94,23 @@ const saveDriverBooking = async (
   return driverBooking;
 };
 
+// add more passengers
+const addPassegers = async(passengerArray, driverid) => {
+  const updatePassengers = await Driver.findOneAndUpdate({driverid}, 
+    {
+      savedBooking: {
+        passengers: passengerArray
+      }
+    }, {new: true})
+  
+
+  return updatePassengers
+}
+
 module.exports = {
   createDriverAccount,
   findDriverByID,
   saveDriverBooking,
+  searchForDrivers,
+  addPassegers
 };

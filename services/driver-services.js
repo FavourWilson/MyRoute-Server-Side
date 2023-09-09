@@ -60,6 +60,7 @@ exports.createDriver = async (
   return driver;
 };
 
+// save a driver booking
 exports.saveDriverBooking = async (
   driverId,
   pickupLocation,
@@ -73,15 +74,19 @@ exports.saveDriverBooking = async (
   price,
   paymentMethod
 ) => {
+  // find the user
+  const userInfo = await userRepository.getUserByID(driverId);
+  if (!userInfo) return helpers.newError("User does not exist", 404);
 
-  const userInfo =  await userRepository.getUserByID(driverId)
-  if(!userInfo)
-    return helpers.newError("User does not exist", 404)
-
+  // find the driver profile
   const driverProfile = await driverRepository.findDriverByID(driverId);
   if (!driverProfile)
-    return helpers.newError("You cannot save you booking, setup your driver account", 409);
+    return helpers.newError(
+      "You cannot save you booking, setup your driver account",
+      409
+    );
 
+  // save the driver profile
   const createDriverBooking = await driverRepository.saveDriverBooking(
     driverId,
     pickupLocation,
@@ -95,6 +100,26 @@ exports.saveDriverBooking = async (
     price,
     paymentMethod
   );
+
+  return createDriverBooking;
+};
+
+// book a driver
+exports.bookDriver = async (userID, driverID) => {
+  const driverResult = await driverRepository.findDriverByID(driverID);
   
-  return createDriverBooking; 
+  const passengerArray = driverResult.savedBooking.passengers
+
+  const availableSeats =
+    driverResult.savedBooking.seatsAvailable -
+    passengerArray.length;
+
+  passengerArray.push(userID)
+
+  if (availableSeats > 0) {
+    const bookedDriver = await driverRepository.addPassegers(passengerArray, driverID);
+    return bookedDriver;
+  }
+
+  return helpers.newError("All seats are occupied", 400);
 };
