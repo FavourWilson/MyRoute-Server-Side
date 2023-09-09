@@ -1,8 +1,7 @@
 const User = require("../models/user-model");
 const OTP = require("../models/OTP-model");
 const ResetOTP = require("../models/reset-OTP-model");
-const BookDriver = require("../models/book-driver-model")
-const helpers = require("../helpers/index")
+const helpers = require("../helpers/index");
 const handleImageUpload = require("../config/cloudinary-config");
 
 // USER
@@ -21,11 +20,12 @@ const getUserByEmail = async (email) => {
 // get user by ID
 const getUserByID = async (_id) => {
   const getUserByID = await User.findById(_id);
-  return getUserByID; 
-}
+  return getUserByID;
+};
 
 // delete user
-const deleteUserAccount = async(email) => await User.findOneAndDelete({ email })
+const deleteUserAccount = async (email) =>
+  await User.findOneAndDelete({ email });
 
 // create new user
 const createNewUser = async (
@@ -52,14 +52,14 @@ const createNewUser = async (
 
 // update user profile
 const updateUserProfile = async (email, body) => {
-  try{
+  try {
     const userInfo = await User.findOne({ email });
-  
+
     let _email = body.email ? body.email : userInfo.email;
     let _firstName = body.firstName ? body.firstName : userInfo.firstName;
     let _lastName = body.lastName ? body.lastName : userInfo.lastName;
-    let _ninDocument = body.ninDocument 
-      ? await handleImageUpload(body.ninDocument) 
+    let _ninDocument = body.ninDocument
+      ? await handleImageUpload(body.ninDocument)
       : userInfo.ninDocument;
     let _phone = body.phone ? body.phone : userInfo.phone;
     let _gender = body.gender ? body.gender : userInfo.gender;
@@ -68,29 +68,30 @@ const updateUserProfile = async (email, body) => {
       : userInfo.profilePic;
     let _password = body.password ? body.password : userInfo.password;
     let _isVerified = body.isVerified ? body.isVerified : userInfo.isVerified;
-    let _canResetPassword = body.canResetPassword ? body.canResetPassword : userInfo.canResetPassword
-  
-  
+    let _canResetPassword = body.canResetPassword
+      ? body.canResetPassword
+      : userInfo.canResetPassword;
+
     // if profile picture is updated
-    const updateProfile =  await User.findOneAndUpdate(
+    const updateProfile = await User.findOneAndUpdate(
       { email },
       {
         email: _email,
         firstName: _firstName,
         lastName: _lastName,
-        profilePic: (body.profilePic ? _profilePic.secure_url : _profilePic),
+        profilePic: body.profilePic ? _profilePic.secure_url : _profilePic,
         ninDocument: _ninDocument,
         phone: _phone,
         gender: _gender,
         password: _password,
         isVerified: _isVerified,
-        canResetPassword: _canResetPassword
+        canResetPassword: _canResetPassword,
       },
       { new: true }
     );
-    return updateProfile
-  }catch(error){
-    helpers.newError(error.message, error.http_code)
+    return updateProfile;
+  } catch (error) {
+    helpers.newError(error.message, error.http_code);
   }
 };
 
@@ -102,7 +103,8 @@ const findResetOTP = async (email) => {
 };
 
 // delete OTP
-const deleteResetOTP = async (email) =>  await ResetOTP.findOneAndDelete({ email });
+const deleteResetOTP = async (email) =>
+  await ResetOTP.findOneAndDelete({ email });
 
 // create reset OTP
 const createResetOtp = async (email, hash) => {
@@ -130,7 +132,7 @@ const createRegisterOtp = async (email, code) => {
 };
 
 // delete user OTP
-const deleteOTP = async (email) =>  await OTP.findOneAndDelete({ email });
+const deleteOTP = async (email) => await OTP.findOneAndDelete({ email });
 
 // find user OTP
 const findOTP = async (email) => {
@@ -140,13 +142,13 @@ const findOTP = async (email) => {
 
 // BOOKING
 // find user booking
-const initBooking = async(userID) => {
-  const userBookingProfile  = await BookDriver.findById(userID)
-  return userBookingProfile
-}
+// const initBooking = async(userID) => {
+//   const userBookingProfile  = await BookDriver.findById(userID)
+//   return userBookingProfile
+// }
 
 // save user booking
-const saveBooking = async (
+const saveUserBooking = async (
   userId,
   whereAreyouLeavingFrom,
   whereAreyouGoing,
@@ -156,21 +158,24 @@ const saveBooking = async (
   preferredRoute,
   whatTimeAreYouGoing
 ) => {
+  const userBooking = await User.findOneAndUpdate(
+    { userId },
+    {
+      savedBooking: {
+        whereAreyouLeavingFrom,
+        whereAreyouGoing,
+        whenAreyouGoing,
+        seatsAvailable,
+        currentMapLocation,
+        preferredRoute,
+        whatTimeAreYouGoing,
+      },
+    },
+    { new: true }
+  );
 
-  const userBooking = await new UserBooking({
-    userId,
-    whereAreyouLeavingFrom,
-    whereAreyouGoing,
-    whenAreyouGoing,
-    seatsAvailable,
-    currentMapLocation,
-    preferredRoute,
-    whatTimeAreYouGoing
-  }).save();
-
- return userBooking
+  return userBooking;
 };
-
 
 module.exports = {
   getUserByEmail,
@@ -184,7 +189,6 @@ module.exports = {
   findOTP,
   deleteOTP,
   getUserByID,
-  initBooking,
-  saveBooking,
-  deleteUserAccount
+  saveUserBooking,
+  deleteUserAccount,
 };

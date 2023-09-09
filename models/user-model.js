@@ -41,6 +41,10 @@ const UserSchema = new mongoose.Schema({
   },
   isVerified: {type: Boolean, default: false},
   canResetPassword: { type: Boolean, default: false},
+  paymentMethod: [{
+    type: String,
+    default: null,
+  }],
   savedBooking: {
     whereAreyouLeavingFrom: {
       type: String,
@@ -64,7 +68,7 @@ const UserSchema = new mongoose.Schema({
     },
     preferredRoute: {
       type: String,
-      default: null,
+      default: null
     },
     whatTimeAreYouGoing: {
       type: String,

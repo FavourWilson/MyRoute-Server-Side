@@ -9,7 +9,7 @@ const {
   updateAccount,
   userBooking,
   deleteUser,
-  searchRide
+  bookDriver
 } = require("../controller/user-controller");
 
 const Router = express.Router();
@@ -21,8 +21,8 @@ Router.route("/resend-code").post(resendOTP);
 Router.route("/forget-password").post(forgetPassword);
 Router.route("/reset-password").post(resetPassword);
 Router.route("/update-account").patch(updateAccount);
-Router.route("/user-booking").post(userBooking);
+Router.route("/save-booking").patch(userBooking);
+Router.route("/book-driver").patch(bookDriver);
 Router.route("/delete-account/:email").delete(deleteUser);
-Router.route("/search-ride").get(searchRide);
 
 module.exports = Router;
