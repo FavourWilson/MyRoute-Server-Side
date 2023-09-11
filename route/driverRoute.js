@@ -1,9 +1,8 @@
 const express = require("express");
-const {createDriver, driverBooking} = require("../controller/driver-controller");
+const {createDriver, saveDriverBooking} = require("../controller/driver-controller");
 
 const Router = express.Router();
 
-// Router.route("/").post(createDriver);
-// Router.route("/save-booking").patch(driverBooking)
+Router.route("/save-booking").post(saveDriverBooking)
 
 module.exports = Router;  

@@ -1,4 +1,4 @@
-const Driver = require("../models/driver-model");
+const Driver = require("../models/driver-booking-model");
 
 // find driver profile
 const findDriverByID = async (driverId) => {
@@ -6,24 +6,16 @@ const findDriverByID = async (driverId) => {
   return driverProfile;
 };
 
-const searchForDrivers = async (
-  whereAreyouGoing,
-  currentMapLocation
-) => {
-  const driverSearchResult = await Driver.find({ currentMapLocation, whereAreyouGoing })
-  return driverSearchResult
-}
-
-// find driver booking
-// const findDriverBooking = async(driverId) => {
-//   const driverBookingProfile  = await DriverBooking.findOne({ driverId })
-//   return driverBookingProfile
-// }
-
+const searchForDrivers = async (whereAreyouGoing, currentMapLocation) => {
+  const driverSearchResult = await Driver.find({
+    currentMapLocation,
+    whereAreyouGoing,
+  });
+  return driverSearchResult;
+};
 
 // save driver booking
 const saveDriverBooking = async (
-  driverId,
   pickupLocation,
   dropOffLocation,
   whenAreyouGoing,
@@ -35,40 +27,40 @@ const saveDriverBooking = async (
   price,
   paymentMethod
 ) => {
+  const driverBooking = await new Driver({
+    pickupLocation,
+    dropOffLocation,
+    whenAreyouGoing,
+    seatsAvailable,
+    currentMapLocation,
+    destination,
+    whatRouteAreYouPassing,
+    whatTimeAreYouGoing,
+    price,
+    paymentMethod,
+  }).save();
 
-  const driverBooking = await Driver.findOneAndUpdate({ driverId }, { 
-    savedBooking : {
-      pickupLocation,
-      dropOffLocation,
-      whenAreyouGoing,
-      seatsAvailable,
-      currentMapLocation,
-      destination,
-      whatRouteAreYouPassing,
-      whatTimeAreYouGoing,
-      price,
-      paymentMethod,
-    }  
-  }, {new: true})  
   return driverBooking;
 };
 
 // add more passengers
-const addPassegers = async(passengerArray, driverid) => {
-  const updatePassengers = await Driver.findOneAndUpdate({driverid}, 
+const addPassegers = async (passengerArray, driverid) => {
+  const updatePassengers = await Driver.findOneAndUpdate(
+    { driverid },
     {
       savedBooking: {
-        passengers: passengerArray
-      }
-    }, {new: true})
-  
+        passengers: passengerArray,
+      },
+    },
+    { new: true }
+  );
 
-  return updatePassengers
-}
+  return updatePassengers;
+};
 
 module.exports = {
   findDriverByID,
   saveDriverBooking,
   searchForDrivers,
-  addPassegers
+  addPassegers,
 };

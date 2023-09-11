@@ -4,7 +4,7 @@ const helpers = require("../helpers/index");
 
 // save a driver booking
 exports.saveDriverBooking = async (
-  driverId,
+  userId,
   pickupLocation,
   dropOffLocation,
   whenAreyouGoing,
@@ -17,20 +17,15 @@ exports.saveDriverBooking = async (
   paymentMethod
 ) => {
   // find the user
-  const userInfo = await userRepository.getUserByID(driverId);
-  if (!userInfo) return helpers.newError("User does not exist", 404);
+  const user = await userRepository.getUserByID(userId);
+  if (!user) return helpers.newError("User does not exist", 404);
 
   // find the driver profile
-  const driverProfile = await driverRepository.findDriverByID(driverId);
-  if (!driverProfile)
-    return helpers.newError(
-      "You cannot save you booking, setup your driver account",
-      409
-    );
+  if (user.driverBooking !== null)
+    return helpers.newError("You have booked a ride as a driver", 403);
 
   // save the driver profile
   const createDriverBooking = await driverRepository.saveDriverBooking(
-    driverId,
     pickupLocation,
     dropOffLocation,
     whenAreyouGoing,
@@ -43,23 +38,28 @@ exports.saveDriverBooking = async (
     paymentMethod
   );
 
+  await userRepository.updateUserProfile(user.email, {
+    driverBooking: createDriverBooking._id,
+  });
   return createDriverBooking;
 };
 
 // book a driver
 exports.bookDriver = async (userID, driverID) => {
   const driverResult = await driverRepository.findDriverByID(driverID);
-  
-  const passengerArray = driverResult.savedBooking.passengers
+
+  const passengerArray = driverResult.savedBooking.passengers;
 
   const availableSeats =
-    driverResult.savedBooking.seatsAvailable -
-    passengerArray.length;
+    driverResult.savedBooking.seatsAvailable - passengerArray.length;
 
-  passengerArray.push(userID)
+  passengerArray.push(userID);
 
   if (availableSeats > 0) {
-    const bookedDriver = await driverRepository.addPassegers(passengerArray, driverID);
+    const bookedDriver = await driverRepository.addPassegers(
+      passengerArray,
+      driverID
+    );
     return bookedDriver;
   }
 

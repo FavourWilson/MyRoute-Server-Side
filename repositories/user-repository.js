@@ -49,6 +49,7 @@ const updateUserProfile = async (email, body) => {
   try {
     const userInfo = await User.findOne({ email });
 
+    let _driverBooking = body.driverBooking ? body.driverBooking : userInfo.driverBooking
     let _card = body.card ? body.card : userInfo.card
     let _car = body.car ? body.car : userInfo.car
     let _email = body.email ? body.email : userInfo.email;
@@ -83,7 +84,8 @@ const updateUserProfile = async (email, body) => {
         isVerified: _isVerified,
         canResetPassword: _canResetPassword,
         car: _car,
-        card: _card
+        card: _card,
+        driverBooking: _driverBooking
       },
       { new: true }
     );

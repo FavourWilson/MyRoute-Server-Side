@@ -57,6 +57,11 @@ const UserSchema = new mongoose.Schema({
     ref: "car",
     default: null
   },
+  driverBooking: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "driver-booking",
+    default: null
+  },
   paymentMethod: [{
     type: String,
     default: null,
