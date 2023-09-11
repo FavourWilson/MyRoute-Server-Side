@@ -5,12 +5,6 @@ const helpers = require("../helpers/index");
 const handleImageUpload = require("../config/cloudinary-config");
 
 // USER
-// check if user exist
-const doesUserExist = async (email) => {
-  const oldUser = await User.findOne({ email });
-  return oldUser;
-};
-
 // get user email
 const getUserByEmail = async (email) => {
   const getUserByEmail = await User.findOne({ email });
@@ -55,6 +49,8 @@ const updateUserProfile = async (email, body) => {
   try {
     const userInfo = await User.findOne({ email });
 
+    let _card = body.card ? body.card : userInfo.card
+    let _car = body.car ? body.car : userInfo.car
     let _email = body.email ? body.email : userInfo.email;
     let _firstName = body.firstName ? body.firstName : userInfo.firstName;
     let _lastName = body.lastName ? body.lastName : userInfo.lastName;
@@ -86,6 +82,8 @@ const updateUserProfile = async (email, body) => {
         password: _password,
         isVerified: _isVerified,
         canResetPassword: _canResetPassword,
+        car: _car,
+        card: _card
       },
       { new: true }
     );
@@ -183,7 +181,6 @@ module.exports = {
   createRegisterOtp,
   createResetOtp,
   deleteResetOTP,
-  doesUserExist,
   updateUserProfile,
   findResetOTP,
   findOTP,
