@@ -7,17 +7,9 @@ const helpers = require("../helpers");
 
 const bcryptSalt = process.env.BCRYPT_SALT;
 
-// user signup handler
-const createUser = async (
-  firstName,
-  lastName,
-  email,
-  phone,
-  gender,
-  password,
-  ninDocument
-) => {
-  const oldUser = await userRepository.doesUserExist(email);
+// handle user signup
+const createUser = async (firstName, lastName, email, phone, gender, password, ninDocument) => {
+  const oldUser = await userRepository.getUserByEmail(email);
   if (oldUser) return helpers.newError("Email already exist", 403);
 
   const OTPCode = helpers.OTP();
@@ -26,35 +18,25 @@ const createUser = async (
   const nin = await handleImageUpload(ninDocument);
   if (!nin.secure_url) return helpers.newError("Could not upload nin", 500);
 
-  const newUser = await userRepository.createNewUser(
-    firstName,
-    lastName,
-    email,
-    phone,
-    gender,
-    password,
-    nin.secure_url
-  );
+  const newUser = await userRepository.createNewUser(firstName, lastName, email, phone, gender, password, nin.secure_url);
   const registeredOTP = await userRepository.createRegisterOtp(email, OTPCode);
 
   return { newUser, registeredOTP };
 };
 
-// login user handler
+// handle user login
 const loginUser = async (email, password) => {
-  const userInfo = await userRepository.doesUserExist(email);
-
+  const userInfo = await userRepository.getUserByEmail(email);
   if (!userInfo) return helpers.newError("User doesn't exist", 404);
+ 
   const isPasswordCorrect = await bcrypt.compare(password, userInfo.password);
-
   if (!isPasswordCorrect) return helpers.newError("Invalid credentials", 400);
-  if (userInfo.isVerified == false)
-    return helpers.newError("Verify your email", 401);
 
+  if (userInfo.isVerified == false) return helpers.newError("Verify your email", 401);
   return userInfo;
 };
 
-// delete user
+// handle user delete
 const deleteUser = async (email) => {
   const userInfo = await userRepository.doesUserExist(email);
   if (!userInfo) return helpers.newError("User doesn't exist", 404);
@@ -62,18 +44,13 @@ const deleteUser = async (email) => {
   await userRepository.deleteUserAccount(email);
 };
 
-// forget password handler
+// handle forget password
 const forgotPassword = async (email) => {
   const userInfo = await userRepository.getUserByEmail(email);
-  if (!userInfo)
-    return helpers.newError(
-      "User not found, Check email again or Register",
-      404
-    );
+  if (!userInfo) return helpers.newError("User does not exist, Check email again or Register", 404);
 
-  // find and delete previous OTP
-  await userRepository.findOTP(email);
-  await userRepository.deleteOTP(email);
+  let passwordResetOTP = await userRepository.findResetOTP(email);
+  if (passwordResetOTP !== null) await userRepository.deleteResetOTP(email)
 
   // implementing a reset token and hashing it using bcrypt
   let resetOTP = crypto.randomBytes(32).toString("hex");
@@ -85,28 +62,18 @@ const forgotPassword = async (email) => {
   return { userInfo, resetOTP };
 };
 
-// reset password handler
+// handle reset password
 const resetPassword = async (email, OTP, password) => {
-  const userInfo = await userRepository.getUserByEmail(email);
-  if (!userInfo)
-    return helpers.newError(
-      "User not found, Check email again or Register",
-      404
-    );
+  const user = await userRepository.getUserByEmail(email);
+  if (!user) return helpers.newError("User not found, Check email again or Register", 404);
 
   let passwordResetOTP = await userRepository.findResetOTP(email);
-
-  if (passwordResetOTP == null) {
-    await userRepository.updateUserProfile(email, { canResetPassword: false });
-    return helpers.newError("password reset OTP expired", 404);
-  }
+  if (passwordResetOTP == null) return helpers.newError("password reset OTP expired", 404);
 
   const isValid = await bcrypt.compare(OTP, passwordResetOTP.OTP);
   if (!isValid) return helpers.newError("Invalid or expired reset token", 404);
 
-  // hash the new password
   const hash = await bcrypt.hash(password, Number(bcryptSalt));
-
   await userRepository.updateUserProfile(email, {
     password: hash,
     canResetPassword: false,
@@ -114,24 +81,21 @@ const resetPassword = async (email, OTP, password) => {
   await userRepository.deleteResetOTP(email);
 };
 
-// verify OTP handler
+// handle OTP verification
 const verifyUser = async (email, OTP) => {
   const user = await userRepository.getUserByEmail(email, "email");
   if (user == null) return helpers.newError("User does not exist", 404);
 
   // check if codeVerification is valid
   const OTPCode = await userRepository.findOTP(email);
-
   if (OTPCode == null) return helpers.newError("Invalid or expired OTP", 404);
-  if (OTP !== OTPCode.OTP)
-    return helpers.newError("OTP was not successfully verified");
+  if (OTP !== OTPCode.OTP) return helpers.newError("OTP was not successfully verified");
 
   await userRepository.updateUserProfile(email, { isVerified: true });
-  console.log("data");
   await userRepository.deleteOTP(email);
 };
 
-// resend OTP handler
+// handle resend OTP
 const resendOtp = async (email) => {
   const OTP = helpers.OTP();
   const user = await userRepository.getUserByEmail(email, "email");
@@ -142,8 +106,8 @@ const resendOtp = async (email) => {
   return { OTP, user };
 };
 
-// create the user booking
-const userBooking = async (
+// handle user send booking
+const saveUserBooking = async (
   userId,
   whereAreyouLeavingFrom,
   whereAreyouGoing,
@@ -164,6 +128,9 @@ const userBooking = async (
     whereAreyouGoing,
     whenAreyouGoing
   );
+
+  if(!searchRides)
+    return helpers.newError("We can't have any driver going to your route", 404)
 
   // save user booking 
   const createUserBooking = await userRepository.saveUserBooking(
@@ -194,7 +161,7 @@ module.exports = {
   verifyUser,
   resendOtp,
   updateAccount,
-  userBooking,
+  saveUserBooking,
   deleteUser,
-  userBooking
+  // userBooking
 };

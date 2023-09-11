@@ -39,8 +39,29 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, "Password cannot be empty"],
   },
-  isVerified: {type: Boolean, default: false},
-  canResetPassword: { type: Boolean, default: false},
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  canResetPassword: { 
+    type: Boolean,
+    default: false
+  },
+  card: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "card",
+    default: null
+  },
+  car: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "car",
+    default: null
+  },
+  driverBooking: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "driver-booking",
+    default: null
+  },
   paymentMethod: [{
     type: String,
     default: null,

@@ -162,7 +162,7 @@ exports.userBooking = catchAsync(async (req, res, next) => {
       whatTimeAreYouGoing,
     } = req.body;
 
-    await userServices.userBooking(
+    await userServices.saveUserBooking(
       userId,
       whereAreyouLeavingFrom,
       whereAreyouGoing,
