@@ -56,6 +56,7 @@ const forgotPassword = async (email) => {
   let resetOTP = crypto.randomBytes(32).toString("hex");
   const hash = await bcrypt.hash(resetOTP, Number(bcryptSalt));
 
+  await userRepository.deleteResetOTP(email)
   await userRepository.createResetOtp(email, hash);
   await userRepository.updateUserProfile(email, { canResetPassword: true });
 
@@ -101,6 +102,7 @@ const resendOtp = async (email) => {
   const user = await userRepository.getUserByEmail(email, "email");
 
   if (user == null) return helpers.newError("User does not exist", 404);
+  await userRepository.deleteOTP(email)
   await userRepository.createRegisterOtp(user.email, OTP);
 
   return { OTP, user };
@@ -153,6 +155,18 @@ const updateAccount = async (email, body) => {
   return isProfileUpdated;
 };
 
+const getUser = async(email) => {
+  try{
+    const user = await userRepository.getUserByEmail(email)
+    if(!user) return helpers.newError("User does not exist", 404)
+  
+    const populatedUserInfo = (await (await (await user.populate('driverBooking')).populate('card')).populate('car'))
+    return populatedUserInfo
+  }catch(error){
+    console.log(error)
+  }
+}
+
 module.exports = {
   createUser,
   loginUser,
@@ -163,5 +177,5 @@ module.exports = {
   updateAccount,
   saveUserBooking,
   deleteUser,
-  // userBooking
+  getUser
 };

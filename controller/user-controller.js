@@ -182,6 +182,7 @@ exports.userBooking = catchAsync(async (req, res, next) => {
   }
 });
 
+// make booking
 exports.bookDriver = async (req, res) => {
   try {
     const { userID, driverID } = req.body;
@@ -211,5 +212,15 @@ exports.deleteUser = async (req, res) => {
       return res
         .status(error.status)
         .json(helpers.sendError(error.message, error.status));
+  }
+};
+
+exports.getUser = async (req, res) => {
+  try {
+    const user =  await userServices.getUser(req.params.email);
+    return res.status(200).json(helpers.sendSuccess( user , 200));
+  } catch (error) {
+    if (error.status)
+      return res.status(error.status).json(helpers.sendError(error.message, error.status));
   }
 };

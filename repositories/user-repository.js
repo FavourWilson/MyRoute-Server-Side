@@ -11,6 +11,13 @@ const getUserByEmail = async (email) => {
   return getUserByEmail;
 };
 
+const getUserAndPopulate = async(email) => {
+  const getUserByEmail = await User.findOne({ email }).populate("driverBooking")
+  
+  console.log(getUserByEmail)
+  // return getUserByEmail;
+}
+
 // get user by ID
 const getUserByID = async (_id) => {
   const getUserByID = await User.findById(_id);
@@ -18,8 +25,7 @@ const getUserByID = async (_id) => {
 };
 
 // delete user
-const deleteUserAccount = async (email) =>
-  await User.findOneAndDelete({ email });
+const deleteUserAccount = async (email) => await User.findOneAndDelete({ email });
 
 // create new user
 const createNewUser = async (
@@ -108,8 +114,6 @@ const deleteResetOTP = async (email) =>
 
 // create reset OTP
 const createResetOtp = async (email, hash) => {
-  deleteResetOTP(email);
-
   await new ResetOTP({
     email: email,
     OTP: hash,
@@ -190,4 +194,5 @@ module.exports = {
   getUserByID,
   saveUserBooking,
   deleteUserAccount,
+  getUserAndPopulate
 };

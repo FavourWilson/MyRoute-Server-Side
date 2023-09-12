@@ -9,7 +9,8 @@ const {
   updateAccount,
   userBooking,
   deleteUser,
-  bookDriver
+  bookDriver,
+  getUser
 } = require("../controller/user-controller");
 
 const Router = express.Router();
@@ -24,5 +25,6 @@ Router.route("/update-account").patch(updateAccount);
 Router.route("/save-booking").patch(userBooking);
 Router.route("/book-driver").patch(bookDriver);
 Router.route("/delete-account/:email").delete(deleteUser);
+Router.route("/account-info/:email").get(getUser);
 
 module.exports = Router;

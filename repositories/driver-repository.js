@@ -1,4 +1,5 @@
 const Driver = require("../models/driver-booking-model");
+const User = require("../models/user-model");
 
 // find driver profile
 const findDriverByID = async (driverId) => {
@@ -57,6 +58,11 @@ const addPassegers = async (passengerArray, driverid) => {
 
   return updatePassengers;
 };
+
+const getTripDetails = async() => {
+  const getUser = await User.findOne({ email })
+  return getUser
+}
 
 module.exports = {
   findDriverByID,
