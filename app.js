@@ -2,7 +2,8 @@ const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-
+const swaggerUI = require('swagger-ui-express')
+const swaggerDocs = require("swagger-jsdoc")
 // import application routes
 const driverRouter = require("./route/driverRoute");
 const userRouter = require("./route/userRoute");
@@ -15,7 +16,21 @@ const { generalErrorHandler } = require("./utils/generalErrorHandler");
 
 // initialize the express app
 const app = express();
-
+const options = {
+	definition: {
+		openapi: '3.0.0',
+		info: {
+			title: 'MyRoute Api',
+			version: '1.0.0'
+		},
+		servers: [
+			{
+				url:'https://myroute-aqn5.onrender.com'
+			}
+		]
+	},
+	apis:['./route/*.js']
+}
 // parsing incoming Json data
 app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({limit: '50mb', extended: true}));
@@ -44,4 +59,6 @@ app.get("/", (req, res) => {
 	});
 });
 
-module.exports = app;
+const swaggerSpec = swaggerDocs(options)
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec ))
+module.exports = app; 
