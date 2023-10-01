@@ -63,7 +63,7 @@ const forgotPassword = async (email) => {
   return { userInfo, resetOTP };
 };
 
-// handle reset password
+// handle user reset password
 const resetPassword = async (email, OTP, password) => {
   const user = await userRepository.getUserByEmail(email);
   if (!user) return helpers.newError("User not found, Check email again or Register", 404);
