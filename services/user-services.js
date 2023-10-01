@@ -44,7 +44,7 @@ const deleteUser = async (email) => {
   await userRepository.deleteUserAccount(email);
 };
 
-// handle forget password
+// handle user forget password
 const forgotPassword = async (email) => {
   const userInfo = await userRepository.getUserByEmail(email);
   if (!userInfo) return helpers.newError("User does not exist, Check email again or Register", 404);
