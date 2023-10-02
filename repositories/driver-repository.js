@@ -32,7 +32,7 @@ const saveDriverBooking = async (
     pickupLocation,
     dropOffLocation,
     whenAreyouGoing,
-    seatsAvailable,
+    seatsAvailable, 
     currentMapLocation,
     destination,
     whatRouteAreYouPassing,

@@ -16,272 +16,526 @@ const {
 const Router = express.Router();
 
 /**
- * 
  * @swagger
  * components:
  *   schemas:
- *    Login:
- *      type:object
- *      required:
- *        - email
- *        - password
- *      properties:
- *        - email:
+ *     User:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
  *           type: string
- *        - password:
+ *         password:
  *           type: string
- *      createdAt:
- *        type: string
- *        format: date
- *      example:
- *        email: AlexDwen@gmail.com
- *        password: naw12qw34
- *        createdAt: 2020-03-10T04:05:06.15TZ
+ *         example:
+ *            email: AlexDewdney@gmail.com
+ *            password: aw2dcv56
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: Login into user account
+ * /api/v1/users/login:
+ *   post:
+ *     summary: Login into user account
+ *     tags: [Login]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: Login into user account.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Some server error
+ *
  */
 Router.route("/login").post(login);
 
+
 /**
- * 
  * @swagger
  * components:
  *   schemas:
- *    Signup:
- *      type:object
- *      required:
- *        - ninDocument
- *        - firstName
- *        - lastName
- *        - phone
- *        - gender
- *        - email
- *        - password
- *      properties:
- *        - ninDocument:
+ *     User:
+ *       type: object
+ *       required:
+ *         - ninDocument
+ *         - firstName
+ *         - lastName
+ *         - email
+ *         - phone
+ *         - gender
+ *         - password
+ *       properties:
+ *         firstName:
  *           type: string
- *        - firstName:
+ *         lastName:
  *           type: string
- *        - lastName:
+ *         email:
  *           type: string
- *        - phone:
+ *         phone:
  *           type: string
- *        - gender:
+ *         gender:
  *           type: string
- *        - email:
+ *         password:
  *           type: string
- *        - password:
+ *         isActive:
+ *           type: boolean
+ *         
+ *         createdAt:
  *           type: string
- *      createdAt:
- *        type: string    
- *        format: date
- *      example:
- *        firstName: Alex
- *        lastName: Dwen
- *        phone: 0913455635
- *        gender: Male
- *        email: AlexDwen@gmail.com
- *        password: naw12qw34
- *        createdAt: 2020-03-10T04:05:06.15TZ
+ *           format: date
+ *           description: The date the book was added
+ *         example:
+*            firstName: Alexander
+*            lastName:  K. Dewdney
+*            email: AlexDewdney@gmail.com
+*            phone:  0912222255
+*            gender:  Male
+*            password: aw2dcv56
+*            createdAt: 2020-03-10T04:05:06.157Z
  */
 
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: The signup new users
+ * /api/v1/users/signup:
+ *   post:
+ *     summary: Create a new user
+ *     tags: [Register]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: The created book.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Some server error
+ *
+ */
 Router.route("/signup").post(signUp);
 
-
 /**
- * 
  * @swagger
  * components:
  *   schemas:
- *    Verify-User:
- *      type:object
- *      required:
- *        - email
- *        - Verification Code
- *      properties:
- *        - email:
+ *     User:
+ *       type: object
+ *       required:
+ *         - email
+ *         - OTP
+ *       properties:
+ *         email:
  *           type: string
- *        - verificationCode:
+ *         OTP:
  *           type: string
- *      example:
- *        email: AlexDwen@gmail.com
- *        verificationCode: 334521
+ *         example:
+*            email: AlexDewdney@gmail.com
+*            OTP:  091222
  */
 
-Router.route("/verify-user").post(verifyOTP);
 /**
- * 
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: The verify user new users
+ * /api/v1/users/verify-user:
+ *   post:
+ *     summary: The verify user new users
+ *     tags: [verify-user]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: The created book.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Some server error
+ *
+ */
+
+
+Router.route("/verify-user").post(verifyOTP);
+
+/**
  * @swagger
  * components:
  *   schemas:
- *    Resend-Code:
- *      type:object
- *      required:
- *        - email
- *      properties:
- *        - email:
+ *     User:
+ *       type: object
+ *       required:
+ *         - email
+ *         - OTP
+ *       properties:
+ *         email:
  *           type: string
- *      example:
- *        email: AlexDwen@gmail.com
+ *         OTP:
+ *           type: string
+ *         example:
+*            email: AlexDewdney@gmail.com
+*            OTP:  091222
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: The resend code to users
+ * /api/v1/users/resend-code:
+ *   post:
+ *     summary: The resend code to users
+ *     tags: [resend-code]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: Reset code has been sent
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Some server error
+ *
  */
 Router.route("/resend-code").post(resendOTP);
 
 /**
- * 
  * @swagger
  * components:
  *   schemas:
- *    Forget-Password:
- *      type:object
- *      required:
- *        - email
- *      properties:
- *        - email:
+ *     User:
+ *       type: object
+ *       required:
+ *         - email
+ *         - OTP
+ *       properties:
+ *         email:
  *           type: string
- *      example:
- *        email: AlexDwen@gmail.com
+ *         OTP:
+ *           type: string
+ *         example:
+*            email: AlexDewdney@gmail.com
+*            OTP:  091222
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: The forget-password for users
+ * /api/v1/users/forget-password:
+ *   post:
+ *     summary: The forget-password for users
+ *     tags: [forget-password]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: Email has been sent.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Some server error
+ *
  */
 Router.route("/forget-password").post(forgetPassword);
 
 /**
- * 
  * @swagger
  * components:
  *   schemas:
- *    Reset-Password:
- *      type:object
- *      required:
- *        - email
- *        - OTP
- *        - password
- *      properties:
- *        - email:
+ *     User:
+ *       type: object
+ *       required:
+ *         - email
+ *         - OTP
+ *         - password
+ *       properties:
+ *         email:
  *           type: string
- *        - OTP:
+ *         OTP:
  *           type: string
- *        - password:
+ *         password:
  *           type: string
- *      example:
- *        email: AlexDwen@gmail.com
- *        OTP: 334556
- *        password: AlexDwe@1324
+ *         example:
+*            email: AlexDewdney@gmail.com
+*            OTP:  091222
+*            password:  Alex0989
  */
-Router.route("/reset-password").post(resetPassword);
+
 /**
- * 
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: User to reset password
+ * /api/v1/users/reset-password:
+ *   post:
+ *     summary: User to reset password
+ *     tags: [reset-password]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: The created book.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Some server error
+ *
+ */
+
+Router.route("/reset-password").post(resetPassword);
+
+/**
  * @swagger
  * components:
  *   schemas:
- *    Update-Account:
- *      type:object
- *      required:
- *        - email
- *        - body
- *      properties:
- *        - email:
+ *     User:
+ *       type: object
+ *       required:
+ *         - email
+ *         - body
+ *       properties:
+ *         email:
  *           type: string
- *        - body:
+ *         body:
  *           type: string
- *      example:
- *        email: AlexDwen@gmail.com
- *        body: {User details attached to a particular user}
+ *         example:
+*            email: AlexDewdney@gmail.com
+*            body:  {User details}
  */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: Update user profile
+ * /api/v1/users/update-account:
+ *   post:
+ *     summary: Update user profile
+ *     tags: [update-account]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: User update successful.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Some server error
+ *
+ */
+
 Router.route("/update-account").patch(updateAccount);
 
 /**
- * 
  * @swagger
  * components:
  *   schemas:
- *    Save-Booking:
- *      type:object
- *      required:
- *        - userId
- *        - whereAreyouLeavingFrom
- *        - whereAreyouGoing
- *        - whenAreyouGoing
- *        - seatsAvailable
- *        - currentMapLocation
- *        - preferredRoute
- *        - whatTimeAreYouGoing
- *      properties:
- *        - userId:
+ *     User:
+ *       type: object
+ *       required:
+ *         - userId
+ *         - whereAreyouLeavingFrom
+ *         - whereAreyouGoing
+ *         - whenAreyouGoing
+ *         - seatsAvailable
+ *         - currentMapLocation
+ *         - preferredRoute
+ *         - whatTimeAreYouGoing
+ *       properties:
+ *         userId:
  *           type: string
- *        - whereAreyouLeavingFrom:
+ *         whereAreyouLeavingFrom:
  *           type: string
- *        - whereAreyouGoing:
+ *         whereAreyouGoing:
  *           type: string
- *        - whenAreyouGoing:
+ *         whenAreyouGoing:
  *           type: string
- *        - seatsAvailable:
+ *         seatsAvailable:
  *           type: string
- *        - currentMapLocation:
+ *         currentMapLocation:
  *           type: string
- *        - preferredRoute:
+ *         preferredRoute:
  *           type: string
- *        - whatTimeAreYouGoing:
+ *         whatTimeAreYouGoing:
  *           type: string
- *      example:
- *        userId: AlexDwen@gmail.com
- *        whereAreyouLeavingFrom: okoko
- *        whereAreyouGoing: Surulere
- *        whenAreyouGoing: 20/09/2023 
- *        seatsAvailable: 3 seats
- *        currentMapLocation: Okoko junction
- *        preferredRoute: Ajegule
- *        whatTimeAreYouGoing: 4:00pm
+ *         example:
+*            userId: AlexDewdney@gmail.com
+*            whereAreyouLeavingFrom:  berger
+*            whereAreyouGoing:  mile 2
+*            whenAreyouGoing:  TOday
+*            seatsAvailable:  2 seats
+*            currentMapLocation:  Berger
+*            preferredRoute: 
+*            whatTimeAreYouGoing: 4pm
  */
-Router.route("/save-booking").patch(userBooking);
 
 /**
- * 
  * @swagger
- * components:
- *   schemas:
- *    book-driver:
- *      type:object
- *      required:
- *        - UserId
- *        - DriverId
- *      properties:
- *        - UserId:
- *           type: string
- *        - DriverId:
- *           type: string
- *      example:
- *        UserId: 6507242114c47b51c22b06bd
- *        DriverId: 6507242114c47b51c22b06bd
+ * tags:
+ *   name: Users
+ *   description: Update user profile
+ * /api/v1/users/save-booking:
+ *   put:
+ *     summary: Update user profile
+ *     tags: [save-booking]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: User update successful.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Some server error
+ *
  */
+
+Router.route("/save-booking").patch(userBooking);
+
+
 Router.route("/book-driver").patch(bookDriver);
+
 /**
- * 
  * @swagger
  * components:
  *   schemas:
- *    Delete-Account:
- *      type:object
- *      required:
- *        - email
- *      properties:
- *        - email:
+ *     User:
+ *       type: object
+ *       required:
+ *         - email
+ *       properties:
+ *         email:
  *           type: string
- *      example:
- *        email:AlexDwen@gmail.com
+ *         example:
+*            email: AlexDewdney@gmail.com
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: Delete user account
+ * /api/v1/users/delete-account/:email:
+ *   delete:
+ *     summary: Delete user account
+ *     tags: [delete-account]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: User deleted successful.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Some server error
+ *
  */
 Router.route("/delete-account/:email").delete(deleteUser);
 
 /**
- * 
  * @swagger
  * components:
  *   schemas:
- *    Account-info:
- *      type:object
- *      required:
- *        - email
- *      properties:
- *        - email:
+ *     User:
+ *       type: object
+ *       required:
+ *         - email
+ *       properties:
+ *         email:
  *           type: string
- *      example:
- *        email:AlexDwen@gmail.com
+ *         example:
+*            email: AlexDewdney@gmail.com
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: fetch user account
+ * /api/v1/users/account-info/:email:
+ *   delete:
+ *     summary: fetch user account
+ *     tags: [account-info]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: User update successful.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Some server error
+ *
  */
 Router.route("/account-info/:email").get(getUser);
 
